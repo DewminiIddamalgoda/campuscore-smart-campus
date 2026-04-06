@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Badge, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 const ResourceCard = ({ resource }) => {
@@ -39,69 +39,69 @@ const ResourceCard = ({ resource }) => {
   };
 
   return (
-    <Card className="resource-card h-100">
-      <Card.Body>
-        <div className="d-flex justify-content-between align-items-start mb-2">
-          <Card.Title className="h5 mb-0">
-            {getTypeIcon(resource.type)} {resource.name}
-          </Card.Title>
-          <span className={getStatusClass(resource.status)}>
-            {resource.status.replace('_', ' ')}
+    <div className="resource-card-modern">
+      <div className="resource-card-header">
+        <h3 className="resource-card-title">
+          <span className="resource-type-icon">{getTypeIcon(resource.type)}</span>
+          {resource.name}
+        </h3>
+        <span className={`resource-status-badge ${getStatusClass(resource.status)}`}>
+          {resource.status.replace('_', ' ')}
+        </span>
+      </div>
+      
+      <div className="resource-card-body">
+        <div className="suitability-badge">
+          <span className={getSuitabilityBadgeClass(resource.suitabilityBadge)}>
+            {resource.suitabilityBadge}
           </span>
         </div>
         
-        <Card.Subtitle className="mb-2 text-muted">
-          {resource.type.replace('_', ' ')}
-        </Card.Subtitle>
-        
-        <div className="mb-3">
-          <div className="suitability-badge mb-2">
-            <span className={getSuitabilityBadgeClass(resource.suitabilityBadge)}>
-              {resource.suitabilityBadge}
-            </span>
+        <div className="resource-info">
+          <div className="resource-info-item">
+            <i className="fa fa-building"></i>
+            <span>{resource.type.replace('_', ' ')}</span>
           </div>
-        </div>
-        
-        <div className="resource-details mb-3">
-          <div className="mb-1">
-            <strong>📍 Location:</strong> {resource.location}
+          <div className="resource-info-item">
+            <i className="fa fa-map-marker"></i>
+            <span>{resource.location}</span>
           </div>
-          <div className="mb-1">
-            <strong>👥 Capacity:</strong> {resource.capacity} people
+          <div className="resource-info-item">
+            <i className="fa fa-users"></i>
+            <span>{resource.capacity} people capacity</span>
           </div>
           {resource.availableFrom && resource.availableTo && (
-            <div className="mb-1">
-              <strong>⏰ Available:</strong> {resource.availableFrom} - {resource.availableTo}
+            <div className="resource-info-item">
+              <i className="fa fa-clock-o"></i>
+              <span>{resource.availableFrom} - {resource.availableTo}</span>
             </div>
           )}
         </div>
         
         {resource.description && (
-          <Card.Text className="text-muted small">
-            {resource.description.length > 100 
-              ? `${resource.description.substring(0, 100)}...` 
+          <p className="text-muted small">
+            {resource.description.length > 120 
+              ? `${resource.description.substring(0, 120)}...` 
               : resource.description}
-          </Card.Text>
+          </p>
         )}
-        
-        <div className="d-flex justify-content-between">
-          <Button 
-            variant="outline-primary" 
-            size="sm"
-            onClick={handleViewDetails}
-          >
-            View Details
-          </Button>
-          <Button 
-            variant="outline-secondary" 
-            size="sm"
-            onClick={handleEdit}
-          >
-            Edit
-          </Button>
-        </div>
-      </Card.Body>
-    </Card>
+      </div>
+      
+      <div className="resource-card-actions">
+        <Button 
+          className="primary-btn"
+          onClick={handleViewDetails}
+        >
+          <i className="fa fa-eye me-2"></i>View Details
+        </Button>
+        <Button 
+          className="secondary-btn"
+          onClick={handleEdit}
+        >
+          <i className="fa fa-edit me-2"></i>Edit
+        </Button>
+      </div>
+    </div>
   );
 };
 
