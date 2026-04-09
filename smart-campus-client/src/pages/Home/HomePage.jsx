@@ -216,15 +216,13 @@ const HomePage = () => {
             </button>
 
             <div className={`sc-nav-links ${menuOpen ? 'open' : ''}`}>
-              <a href="#home" className="smoothScroll">Home</a>
+              <a href="/" className="smoothScroll">Home</a>
               <a href="#about" className="smoothScroll">About</a>
               <a href="#feature" className="smoothScroll">Features</a>
               <Link to="/resources" onClick={() => setMenuOpen(false)}>Resources</Link>
               <a href="#testimonial" className="smoothScroll">Reviews</a>
               <a href="#contact" className="smoothScroll">Contact</a>
-              <a href="tel:+94117544801" className="sc-nav-phone">
-                <i className="fa fa-phone" /> +94 11 754 4801
-              </a>
+              <a href="#login" className="sc-nav-phone">Login</a>
             </div>
           </div>
         </Container>
