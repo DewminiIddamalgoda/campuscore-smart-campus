@@ -1,24 +1,15 @@
 # Smart Campus Resource Management System
 
-## Overview
-This is Component 1 of the Smart Campus project - **Facilities & Assets Catalogue / Resource Management**. This system manages campus resources such as lecture halls, labs, meeting rooms, and equipment.
 
 ## Features
 
 ### Core Features
-- ✅ **CRUD Operations**: Create, Read, Update, Delete resources
-- ✅ **Search & Filter**: Filter by type, location, capacity, and status
-- ✅ **Smart Suitability Badge**: Intelligent resource recommendations
-- ✅ **RESTful API**: Clean Spring Boot backend with proper HTTP methods
-- ✅ **Modern UI**: React frontend with Bootstrap styling
+   **CRUD Operations**: Create, Read, Update, Delete resources
+   **Search & Filter**: Filter by type, location, capacity, and status
+   **Smart Suitability Badge**: Intelligent resource recommendations
+   **RESTful API**: Clean Spring Boot backend with proper HTTP methods
+   **Modern UI**: React frontend with Bootstrap styling
 
-### Unique Feature: Smart Suitability Badge
-The system automatically calculates and displays suitability badges:
-- 🎓 **Best for lectures** - Large lecture halls (>80 capacity)
-- 👥 **Best for small meetings** - Small meeting rooms (≤15 capacity)
-- 🔬 **Best for practical labs** - All lab resources
-- ⏰ **Limited availability** - Resources with <4 hours availability
-- 🚫 **Temporarily unavailable** - Out of service resources
 
 ## Technology Stack
 
@@ -213,12 +204,5 @@ Error responses include:
 }
 ```
 
-## Future Enhancements
 
-- [ ] Authentication and authorization
-- [ ] Resource booking system
-- [ ] Real-time availability updates
-- [ ] Mobile-responsive design improvements
-- [ ] Advanced analytics dashboard
-- [ ] Resource maintenance scheduling
 
