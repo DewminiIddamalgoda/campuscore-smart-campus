@@ -3,21 +3,22 @@ package com.groupxx.smartcampus.repository;
 import com.groupxx.smartcampus.entity.Resource;
 import com.groupxx.smartcampus.enums.ResourceStatus;
 import com.groupxx.smartcampus.enums.ResourceType;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ResourceRepository extends JpaRepository<Resource, Long> {
+public interface ResourceRepository extends MongoRepository<Resource, String> {
 
-    @Query("SELECT r FROM Resource r WHERE " +
-           "(:type IS NULL OR r.type = :type) AND " +
-           "(:location IS NULL OR LOWER(r.location) LIKE LOWER(CONCAT('%', :location, '%'))) AND " +
-           "(:minCapacity IS NULL OR r.capacity >= :minCapacity) AND " +
-           "(:status IS NULL OR r.status = :status)")
+    @Query("{ '$and': [ " +
+           " { '$or': [ { 'type': null }, { 'type': ?0 } ] }, " +
+           " { '$or': [ { 'location': null }, { 'location': { '$regex': ?1, '$options': 'i' } } ] }, " +
+           " { '$or': [ { 'capacity': null }, { 'capacity': { '$gte': ?2 } } ] }, " +
+           " { '$or': [ { 'status': null }, { 'status': ?3 } ] } " +
+           "] }")
     List<Resource> findByFilters(@Param("type") ResourceType type,
                                 @Param("location") String location,
                                 @Param("minCapacity") Integer minCapacity,

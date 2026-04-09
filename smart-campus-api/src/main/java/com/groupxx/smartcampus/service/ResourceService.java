@@ -13,11 +13,11 @@ public interface ResourceService {
 
     List<ResourceResponseDto> getAllResources();
 
-    ResourceResponseDto getResourceById(Long id);
+    ResourceResponseDto getResourceById(String id);
 
-    ResourceResponseDto updateResource(Long id, ResourceRequestDto resourceDto);
+    ResourceResponseDto updateResource(String id, ResourceRequestDto resourceDto);
 
-    void deleteResource(Long id);
+    void deleteResource(String id);
 
     List<ResourceResponseDto> searchResources(ResourceFilterDto filterDto);
 

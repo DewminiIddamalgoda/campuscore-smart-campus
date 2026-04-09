@@ -28,8 +28,8 @@ const HomePage = () => {
       title: 'Built for Smart Campus Operations',
       subtitle:
         'A modern web solution using Spring Boot and React to support facilities, bookings, maintenance, and notifications.',
-      buttonText: 'Contact Us',
-      buttonTarget: '#contact',
+      buttonText: 'Admin Dashboard',
+      buttonTarget: '/admin/dashboard',
       className: 'hero-slide hero-slide-3',
     },
   ];

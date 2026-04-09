@@ -36,14 +36,14 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public ResourceResponseDto getResourceById(Long id) {
+    public ResourceResponseDto getResourceById(String id) {
         Resource resource = resourceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
         return convertToResponseDto(resource);
     }
 
     @Override
-    public ResourceResponseDto updateResource(Long id, ResourceRequestDto resourceDto) {
+    public ResourceResponseDto updateResource(String id, ResourceRequestDto resourceDto) {
         Resource existingResource = resourceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
 
@@ -53,7 +53,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public void deleteResource(Long id) {
+    public void deleteResource(String id) {
         Resource resource = resourceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
         resourceRepository.delete(resource);

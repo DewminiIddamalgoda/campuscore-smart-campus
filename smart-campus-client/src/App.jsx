@@ -1,13 +1,35 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import Header from './components/layout/Header';
+import Footer from './components/layout/Footer';
+import AdminLayout from './components/admin/AdminLayout';
 import HomePage from './pages/Home/HomePage';
-import ResourceListPage from './pages/Resource/ResourceListPage';
-import ResourceDetailsPage from './pages/Resource/ResourceDetailsPage';
-import AddResourcePage from './pages/Resource/AddResourcePage';
-import EditResourcePage from './pages/Resource/EditResourcePage';
+import ResourceListPage from './pages/resources/ResourceListPage';
+import ResourceDetailsPage from './pages/resources/ResourceDetailsPage';
+import AddResourcePage from './pages/resources/AddResourcePage';
+import EditResourcePage from './pages/resources/EditResourcePage';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminResources from './pages/admin/AdminResources';
 import TestPage from './pages/TestPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+// User Layout Component
+const UserLayout = ({ children }) => (
+  <div className="user-layout d-flex flex-column min-vh-100">
+    <Header isAdmin={false} />
+    <main className="flex-grow-1">
+      {children}
+    </main>
+    <Footer />
+  </div>
+);
+
+// Admin Layout Component
+const AdminLayoutWrapper = ({ children }) => (
+  <AdminLayout>
+    {children}
+  </AdminLayout>
+);
 
 function App() {
   console.log('App component rendered');
@@ -15,13 +37,19 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <Navbar />
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/resources" element={<ResourceListPage />} />
-          <Route path="/resources/:id" element={<ResourceDetailsPage />} />
-          <Route path="/resources/add" element={<AddResourcePage />} />
-          <Route path="/resources/edit/:id" element={<EditResourcePage />} />
+          {/* User Routes */}
+          <Route path="/" element={<UserLayout><HomePage /></UserLayout>} />
+          <Route path="/resources" element={<UserLayout><ResourceListPage /></UserLayout>} />
+          <Route path="/resources/:id" element={<UserLayout><ResourceDetailsPage /></UserLayout>} />
+          <Route path="/resources/add" element={<UserLayout><AddResourcePage /></UserLayout>} />
+          <Route path="/resources/edit/:id" element={<UserLayout><EditResourcePage /></UserLayout>} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin/dashboard" element={<AdminLayoutWrapper><AdminDashboard /></AdminLayoutWrapper>} />
+          <Route path="/admin/resources" element={<AdminLayoutWrapper><AdminResources /></AdminLayoutWrapper>} />
+          
+          {/* Test Routes */}
           <Route path="/test" element={<TestPage />} />
           <Route path="/test/:id" element={<TestPage />} />
         </Routes>

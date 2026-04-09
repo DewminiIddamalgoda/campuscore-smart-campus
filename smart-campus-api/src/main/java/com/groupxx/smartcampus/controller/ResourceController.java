@@ -33,20 +33,20 @@ public class ResourceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResourceResponseDto> getResourceById(@PathVariable Long id) {
+    public ResponseEntity<ResourceResponseDto> getResourceById(@PathVariable String id) {
         ResourceResponseDto resource = resourceService.getResourceById(id);
         return ResponseEntity.ok(resource);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResourceResponseDto> updateResource(@PathVariable Long id, 
+    public ResponseEntity<ResourceResponseDto> updateResource(@PathVariable String id, 
                                                              @Valid @RequestBody ResourceRequestDto resourceDto) {
         ResourceResponseDto updatedResource = resourceService.updateResource(id, resourceDto);
         return ResponseEntity.ok(updatedResource);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteResource(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteResource(@PathVariable String id) {
         resourceService.deleteResource(id);
         return ResponseEntity.noContent().build();
     }
