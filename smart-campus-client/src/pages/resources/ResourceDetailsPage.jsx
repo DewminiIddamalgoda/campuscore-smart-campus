@@ -132,12 +132,7 @@ const ResourceDetailsPage = () => {
               {resource.type.replace('_', ' ')} • {resource.capacity} people capacity • {resource.location}
             </p>
             <div className="resources-actions">
-              <Button className="primary-btn" onClick={() => navigate(`/resources/edit/${resource.id}`)}>
-                <i className="fa fa-edit me-2"></i>Edit Resource
-              </Button>
-              <Button className="secondary-btn" onClick={handleDelete}>
-                <i className="fa fa-trash me-2"></i>Delete Resource
-              </Button>
+              
             </div>
           </div>
         </Container>
