@@ -98,7 +98,7 @@ const ResourceCard = ({ resource }) => {
           className="secondary-btn"
           onClick={handleEdit}
         >
-          <i className="fa fa-edit me-2"></i>Edit
+          <i className="fa fa-edit me-2"></i>Book Now 
         </Button>
       </div>
     </div>

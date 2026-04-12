@@ -84,8 +84,7 @@ PAF_Assignment/
 ### Backend Setup
 ```bash
 cd smart-campus-api
-mvn clean install
-mvn spring-boot:run
+.\mvnw.cmd spring-boot:run
 ```
 The API will be available at `http://localhost:8080/api`
 

@@ -1,65 +1,139 @@
 import React from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
-import { FaGithub, FaEnvelope, FaPhone } from 'react-icons/fa';
+import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import './Footer.css';
 
 const Footer = () => {
   return (
-    <footer className="bg-dark text-light py-4 mt-auto">
+    <footer id="footer" className="site-footer">
+      <div className="footer-glow footer-glow-1"></div>
+      <div className="footer-glow footer-glow-2"></div>
+
       <Container>
-        <Row>
-          <Col md={4}>
-            <h5 className="mb-3">Smart Campus</h5>
-            <p className="text-muted">
-              Modern campus resource management system for efficient facility booking and maintenance tracking.
-            </p>
+        <div className="footer-top-card">
+          <Row className="align-items-center g-4">
+            <Col lg={8} md={12}>
+              <div className="footer-cta">
+                <span className="footer-badge">CampusCore Platform</span>
+                <h2>Manage campus resources with clarity, speed, and control</h2>
+                <p>
+                  A smarter way to organize facilities, assets, bookings, and campus
+                  operations in one modern platform.
+                </p>
+              </div>
+            </Col>
+
+            <Col lg={4} md={12}>
+              <div className="footer-cta-actions">
+                <Link to="/resources" className="footer-cta-btn primary">
+                  Explore Resources
+                </Link>
+                <a href="#contact" className="footer-cta-btn secondary smoothScroll">
+                  Request Demo
+                </a>
+              </div>
+            </Col>
+          </Row>
+        </div>
+
+        <Row className="g-4 footer-main-row">
+          <Col lg={4} md={6} sm={12}>
+            <div className="footer-block footer-brand-block">
+              <div className="footer-logo-wrap">
+                <div className="footer-logo-icon">
+                  <i className="fa fa-university" />
+                </div>
+                <div>
+                  <h3>CampusCore</h3>
+                  <span className="footer-subtitle">Smart resource management platform</span>
+                </div>
+              </div>
+
+              <p className="footer-description">
+                Built for efficient campus operations with better visibility for
+                facilities, assets, bookings, and support workflows.
+              </p>
+
+              <div className="footer-socials">
+                <a href="/" aria-label="Facebook"><i className="fa fa-facebook-square" /></a>
+                <a href="/" aria-label="Twitter"><i className="fa fa-twitter" /></a>
+                <a href="/" aria-label="GitHub"><i className="fa fa-github" /></a>
+                <a href="/" aria-label="LinkedIn"><i className="fa fa-linkedin" /></a>
+              </div>
+            </div>
           </Col>
-          
-          <Col md={4}>
-            <h5 className="mb-3">Quick Links</h5>
-            <ul className="list-unstyled">
-              <li className="mb-2">
-                <a href="/" className="text-muted text-decoration-none">Home</a>
-              </li>
-              <li className="mb-2">
-                <a href="/resources" className="text-muted text-decoration-none">Resources</a>
-              </li>
-              <li className="mb-2">
-                <a href="/about" className="text-muted text-decoration-none">About</a>
-              </li>
-              <li className="mb-2">
-                <a href="/contact" className="text-muted text-decoration-none">Contact</a>
-              </li>
-            </ul>
+
+          <Col lg={2} md={6} sm={6}>
+            <div className="footer-block">
+              <h4>Platform</h4>
+              <div className="footer-links">
+                <a href="#about" className="smoothScroll">About</a>
+                <a href="#feature" className="smoothScroll">Features</a>
+                <Link to="/resources">Resources</Link>
+                <a href="#testimonial" className="smoothScroll">Reviews</a>
+              </div>
+            </div>
           </Col>
-          
-          <Col md={4}>
-            <h5 className="mb-3">Contact Info</h5>
-            <div className="text-muted">
-              <p className="mb-2">
-                <FaEnvelope className="me-2" />
-                info@smartcampus.edu
+
+          <Col lg={2} md={6} sm={6}>
+            <div className="footer-block">
+              <h4>Modules</h4>
+              <div className="footer-links">
+                <Link to="/resources">Catalogue</Link>
+                <a href="#courses" className="smoothScroll">Bookings</a>
+                <a href="#courses" className="smoothScroll">Incidents</a>
+                <a href="#contact" className="smoothScroll">Support</a>
+              </div>
+            </div>
+          </Col>
+
+          <Col lg={4} md={6} sm={12}>
+            <div className="footer-block footer-newsletter advanced-newsletter">
+              <h4>Stay Updated</h4>
+              <p className="newsletter-text">
+                Get updates about new platform improvements, system enhancements, and
+                smart campus features.
               </p>
-              <p className="mb-2">
-                <FaPhone className="me-2" />
-                +1 (555) 123-4567
-              </p>
-              <p className="mb-2">
-                <FaGithub className="me-2" />
-                Smart Campus GitHub
-              </p>
+
+              <form className="footer-newsletter-form">
+                <div className="newsletter-input-wrap">
+                  <i className="fa fa-envelope-o newsletter-icon" />
+                  <input
+                    type="email"
+                    className="modern-input footer-input"
+                    placeholder="Enter your email address"
+                    required
+                  />
+                </div>
+
+                <Button className="modern-btn w-100 footer-subscribe-btn" variant="primary">
+                  Subscribe Now
+                </Button>
+              </form>
+
+              <div className="footer-contact-mini">
+                <div className="mini-contact-item">
+                  <i className="fa fa-phone" />
+                  <span>+94 11 754 4801</span>
+                </div>
+                <div className="mini-contact-item">
+                  <i className="fa fa-envelope" />
+                  <a href="mailto:campuscore@group.com">campuscore@group.com</a>
+                </div>
+              </div>
             </div>
           </Col>
         </Row>
-        
-        <hr className="my-4 border-secondary" />
-        
-        <Row>
-          <Col className="text-center">
-            <p className="text-muted mb-0">
-              © 2026 Smart Campus. All rights reserved. | IT3030 PAF Assignment
-            </p>
-          </Col>
-        </Row>
+
+        <div className="footer-bottom">
+          <div className="footer-bottom-left">
+            <p>© 2026 CampusCore. All rights reserved.</p>
+          </div>
+
+          <div className="footer-bottom-right">
+            <span>Designed for IT3030 PAF Assignment</span>
+          </div>
+        </div>
       </Container>
     </footer>
   );

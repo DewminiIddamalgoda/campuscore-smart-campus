@@ -1,0 +1,197 @@
+/* Header and Navbar Styles */
+.sc-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sc-navbar-inner {
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.sc-brand {
+  color: var(--white);
+  font-size: 24px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.sc-brand:hover {
+  color: #dbeafe;
+  text-decoration: none;
+}
+
+.sc-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.sc-nav-links a {
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.sc-nav-links a::after {
+  content: none;
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #06b6d4, #10b981);
+  transition: width 0.3s ease;
+}
+
+.sc-nav-links a:hover::after {
+  width: 0;
+}
+
+.sc-nav-links a:hover {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.sc-nav-phone {
+  padding: 11px 16px;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.22), rgba(16, 185, 129, 0.22));
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: 8px;
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.sc-nav-phone:hover {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.32), rgba(16, 185, 129, 0.32));
+  border-color: rgba(6, 182, 212, 0.4);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.sc-menu-toggle {
+  display: none;
+  width: 46px;
+  height: 46px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+.sc-menu-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.sc-menu-toggle span {
+  display: block;
+  height: 2px;
+  background: #fff;
+  width: 20px;
+  transition: all 0.3s ease;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .sc-nav-links {
+    position: fixed;
+    top: 82px;
+    left: 0;
+    width: 100%;
+    background: rgba(15, 23, 42, 0.98);
+    backdrop-filter: blur(12px);
+    flex-direction: column;
+    gap: 0;
+    padding: 20px;
+    transform: translateY(-20px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  
+  .sc-nav-links.open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .sc-nav-links a {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    width: 100%;
+    text-align: center;
+  }
+  
+  .sc-nav-links a:last-child {
+    border-bottom: none;
+  }
+  
+  .sc-menu-toggle {
+    display: flex;
+  }
+}
+
+/* Additional responsive adjustments */
+@media (max-width: 576px) {
+  .sc-navbar-inner {
+    padding: 0 15px;
+  }
+  
+  .sc-brand {
+    font-size: 20px;
+  }
+  
+  .sc-menu-toggle {
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+  }
+  
+  .sc-menu-toggle span {
+    width: 18px;
+  }
+  
+  .sc-nav-links {
+    top: 70px;
+  }
+}
+
+/* Smooth scroll animation */
+.smoothScroll {
+  scroll-behavior: smooth;
+}
+
+/* Focus states for accessibility */
+.sc-nav-links a:focus,
+.sc-nav-phone:focus,
+.sc-menu-toggle:focus {
+  outline: 2px solid #06b6d4;
+  outline-offset: 2px;
+}
+
+/* CSS Variables for consistency */
+:root {
+  --white: #ffffff;
+}

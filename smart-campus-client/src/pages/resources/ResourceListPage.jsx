@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Button, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +14,7 @@ const ResourceListPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const filterRef = useRef();
 
   useEffect(() => {
     fetchResources();
@@ -34,23 +35,13 @@ const ResourceListPage = () => {
     }
   };
 
-  const handleFilter = async (filters) => {
-    try {
-      setLoading(true);
-      const hasFilters = Object.values(filters).some(value => value !== '');
-      
-      if (hasFilters) {
-        const data = await resourceApi.searchResources(filters);
-        setFilteredResources(data);
-      } else {
-        setFilteredResources(resources);
-      }
-      setError(null);
-    } catch (err) {
-      setError('Failed to search resources. Please try again later.');
-      console.error('Error searching resources:', err);
-    } finally {
-      setLoading(false);
+  const handleFilterChange = (filters) => {
+    // Apply filters to resources using the filter function from ResourceFilter
+    if (filters.filterFunction && resources.length > 0) {
+      const filtered = filters.filterFunction(resources);
+      setFilteredResources(filtered);
+    } else {
+      setFilteredResources(resources);
     }
   };
 
@@ -88,9 +79,9 @@ const ResourceListPage = () => {
 
   return (
     <div className="resources-page py-4">
-      <Container>
+      <Container fluid>
         {/* Header Section */}
-        <div className="text-center mb-5">
+        <div className="mb-5">
           <h1 className="display-4 fw-bold mb-3">
             <FaSearch className="text-primary me-3" />
             Campus Resources
@@ -98,16 +89,6 @@ const ResourceListPage = () => {
           <p className="lead text-muted mb-4">
             Discover and explore campus facilities, lecture halls, labs, meeting rooms, and equipment
           </p>
-          <div className="d-flex justify-content-center gap-3">
-            <Button 
-              variant="primary" 
-              onClick={() => navigate('/resources/add')}
-              className="px-4"
-            >
-              <FaPlus className="me-2" />
-              Add Resource
-            </Button>
-          </div>
         </div>
 
         {/* Filter Section */}
@@ -117,7 +98,7 @@ const ResourceListPage = () => {
               <FaFilter className="me-2" />
               Filter Resources
             </h5>
-            <ResourceFilter onFilter={handleFilter} onReset={handleReset} />
+            <ResourceFilter onFilter={handleFilterChange} onReset={handleReset} />
           </div>
         </div>
 
