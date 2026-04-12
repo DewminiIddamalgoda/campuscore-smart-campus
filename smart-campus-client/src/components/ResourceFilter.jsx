@@ -1,139 +1,131 @@
 import React, { useState } from 'react';
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import {
+  Card,
+  Row,
+  Col,
+  Button,
+  Form,
+  InputGroup,
+  FormControl
+} from 'react-bootstrap';
+import { 
+  FaSearch, 
+  FaFilter
+} from 'react-icons/fa';
 
 const ResourceFilter = ({ onFilter, onReset }) => {
-  const [filters, setFilters] = useState({
-    type: '',
-    location: '',
-    minCapacity: '',
-    status: ''
-  });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFilters(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  const resourceTypes = [
+    { value: 'LECTURE_HALL', label: 'Lecture Hall' },
+    { value: 'LAB', label: 'Lab' },
+    { value: 'MEETING_ROOM', label: 'Meeting Room' },
+    { value: 'EQUIPMENT', label: 'Equipment' }
+  ];
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onFilter(filters);
+  const statusOptions = [
+    { value: 'ACTIVE', label: 'Active', variant: 'success' },
+    { value: 'OUT_OF_SERVICE', label: 'Out of Service', variant: 'danger' },
+    { value: 'UNDER_MAINTENANCE', label: 'Under Maintenance', variant: 'warning' }
+  ];
+
+  // Filter function that returns filtered resources
+  const filterResources = (resources) => {
+    return resources.filter(resource => {
+      const matchesSearch = resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           resource.location.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesType = filterType === 'all' || resource.type === filterType;
+      const matchesStatus = filterStatus === 'all' || resource.status === filterStatus;
+      
+      return matchesSearch && matchesType && matchesStatus;
+    });
   };
 
   const handleReset = () => {
-    setFilters({
-      type: '',
-      location: '',
-      minCapacity: '',
-      status: ''
-    });
-    onReset();
+    setSearchTerm('');
+    setFilterType('all');
+    setFilterStatus('all');
+    if (onReset) {
+      onReset();
+    }
   };
 
+  // Expose filter function and current filter values to parent
+  React.useImperativeHandle(React.createRef(), () => ({
+    filterResources,
+    getFilters: () => ({ searchTerm, filterType, filterStatus })
+  }));
+
+  // Also provide callback-based filtering for compatibility
+  if (onFilter) {
+    React.useEffect(() => {
+      const filters = {
+        searchTerm,
+        filterType,
+        filterStatus,
+        filterFunction: filterResources
+      };
+      onFilter(filters);
+    }, [searchTerm, filterType, filterStatus]);
+  }
+
   return (
-    <div className="resource-filter">
-      <div className="filter-header">
-        <h3 className="filter-title">
-          <i className="fa fa-search me-2"></i>
-          Search & Filter Resources
-        </h3>
-        <p className="filter-subtitle">
-          Find the perfect campus resource by type, location, capacity, or status
-        </p>
-      </div>
-      
-      <Form onSubmit={handleSubmit} className="filter-form">
-        <Row className="g-3">
-          <Col md={3}>
-            <Form.Group className="filter-group">
-              <Form.Label className="filter-label">
-                <i className="fa fa-building me-1"></i>
-                Resource Type
-              </Form.Label>
-              <Form.Select 
-                name="type" 
-                value={filters.type} 
-                onChange={handleChange}
-                className="modern-input"
-              >
-                <option value="">All Types</option>
-                <option value="LECTURE_HALL">🎓 Lecture Hall</option>
-                <option value="LAB">🔬 Lab</option>
-                <option value="MEETING_ROOM">👥 Meeting Room</option>
-                <option value="EQUIPMENT">📦 Equipment</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-          
-          <Col md={3}>
-            <Form.Group className="filter-group">
-              <Form.Label className="filter-label">
-                <i className="fa fa-map-marker me-1"></i>
-                Location
-              </Form.Label>
-              <Form.Control
-                type="text"
-                name="location"
-                value={filters.location}
-                onChange={handleChange}
-                placeholder="Enter location"
-                className="modern-input"
+    <Card className="mb-4 shadow-sm border-0">
+      <Card.Body>
+        <Row>
+          <Col md={4}>
+            <InputGroup>
+              <InputGroup.Text>
+                <FaSearch />
+              </InputGroup.Text>
+              <FormControl
+                placeholder="Search resources..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
-            </Form.Group>
+            </InputGroup>
           </Col>
-          
+          <Col md={3}>
+            <Form.Select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+            >
+              <option value="all">All Types</option>
+              {resourceTypes.map(type => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </Form.Select>
+          </Col>
+          <Col md={3}>
+            <Form.Select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
+              <option value="all">All Status</option>
+              {statusOptions.map(status => (
+                <option key={status.value} value={status.value}>
+                  {status.label}
+                </option>
+              ))}
+            </Form.Select>
+          </Col>
           <Col md={2}>
-            <Form.Group className="filter-group">
-              <Form.Label className="filter-label">
-                <i className="fa fa-users me-1"></i>
-                Min Capacity
-              </Form.Label>
-              <Form.Control
-                type="number"
-                name="minCapacity"
-                value={filters.minCapacity}
-                onChange={handleChange}
-                placeholder="0"
-                min="0"
-                className="modern-input"
-              />
-            </Form.Group>
-          </Col>
-          
-          <Col md={2}>
-            <Form.Group className="filter-group">
-              <Form.Label className="filter-label">
-                <i className="fa fa-info-circle me-1"></i>
-                Status
-              </Form.Label>
-              <Form.Select 
-                name="status" 
-                value={filters.status} 
-                onChange={handleChange}
-                className="modern-input"
-              >
-                <option value="">All Status</option>
-                <option value="ACTIVE">✅ Active</option>
-                <option value="OUT_OF_SERVICE">❌ Out of Service</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-          
-          <Col md={2} className="d-flex align-items-end">
-            <div className="filter-actions">
-              <Button type="submit" className="primary-btn w-100 mb-2">
-                <i className="fa fa-search me-2"></i>Search
-              </Button>
-              <Button type="button" className="secondary-btn w-100" onClick={handleReset}>
-                <i className="fa fa-refresh me-2"></i>Reset
-              </Button>
-            </div>
+            <Button 
+              variant="outline-secondary" 
+              className="w-100"
+              onClick={handleReset}
+            >
+              <FaFilter className="me-2" />
+              Clear
+            </Button>
           </Col>
         </Row>
-      </Form>
-    </div>
+      </Card.Body>
+    </Card>
   );
 };
 
