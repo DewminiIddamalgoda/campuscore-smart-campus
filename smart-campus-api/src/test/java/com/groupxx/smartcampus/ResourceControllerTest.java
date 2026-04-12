@@ -2,6 +2,7 @@ package com.groupxx.smartcampus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.groupxx.smartcampus.dto.ResourceRequestDto;
+import com.groupxx.smartcampus.controller.ResourceController;
 import com.groupxx.smartcampus.enums.ResourceStatus;
 import com.groupxx.smartcampus.enums.ResourceType;
 import com.groupxx.smartcampus.service.ResourceService;
@@ -21,7 +22,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest
+@WebMvcTest(ResourceController.class)
 public class ResourceControllerTest {
 
     @Autowired
