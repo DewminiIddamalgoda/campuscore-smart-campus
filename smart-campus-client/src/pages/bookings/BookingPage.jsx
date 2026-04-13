@@ -32,6 +32,7 @@ const BookingPage = () => {
     status: ''
   });
   const [formData, setFormData] = useState(EMPTY_FORM);
+  const [editingBookingId, setEditingBookingId] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
@@ -158,8 +159,30 @@ const BookingPage = () => {
 
   const resetBookingForm = () => {
     setFormData(EMPTY_FORM);
+    setEditingBookingId('');
     setValidationErrors({});
     setFeedback({ type: '', message: '' });
+  };
+
+  const handleEditBooking = (booking) => {
+    setEditingBookingId(booking.id);
+    setValidationErrors({});
+    setFormData({
+      resourceId: booking.resourceId || '',
+      bookedByName: booking.bookedByName || '',
+      bookedByEmail: booking.bookedByEmail || '',
+      purpose: booking.purpose || '',
+      attendeeCount: booking.attendeeCount != null ? String(booking.attendeeCount) : '',
+      bookingDate: booking.bookingDate || '',
+      startTime: booking.startTime || '',
+      endTime: booking.endTime || '',
+      notes: booking.notes || ''
+    });
+
+    setFeedback({
+      type: 'info',
+      message: 'Editing booking. Update details and save changes.'
+    });
   };
 
   const handleSubmit = async (event) => {
@@ -180,17 +203,26 @@ const BookingPage = () => {
     }
 
     try {
-      await bookingApi.createBooking({
+      const payload = {
         ...formData,
         attendeeCount: Number(formData.attendeeCount)
-      });
+      };
+
+      if (editingBookingId) {
+        await bookingApi.updateBooking(editingBookingId, payload);
+      } else {
+        await bookingApi.createBooking(payload);
+      }
 
       setFormData(EMPTY_FORM);
+      setEditingBookingId('');
       setValidationErrors({});
       await refreshBookings();
       setFeedback({
         type: 'success',
-        message: 'Booking request submitted successfully.'
+        message: editingBookingId
+          ? 'Booking updated successfully.'
+          : 'Booking request submitted successfully.'
       });
     } catch (error) {
       const backendFieldErrors = error?.response?.data?.errors;
@@ -287,8 +319,12 @@ const BookingPage = () => {
               <Card className="booking-card shadow-sm">
                 <Card.Body>
                   <div className="booking-section-heading">
-                    <h2>Create Booking</h2>
-                    <p>Choose an active resource and request a time slot.</p>
+                    <h2>{editingBookingId ? 'Edit Booking' : 'Create Booking'}</h2>
+                    <p>
+                      {editingBookingId
+                        ? 'Update booking details and save changes.'
+                        : 'Choose an active resource and request a time slot.'}
+                    </p>
                   </div>
 
                   <Form onSubmit={handleSubmit}>
@@ -467,7 +503,7 @@ const BookingPage = () => {
 
                     <div className="booking-actions">
                       <Button type="submit" className="booking-primary-btn" disabled={submitting}>
-                        {submitting ? 'Submitting...' : 'Submit Booking'}
+                        {submitting ? 'Submitting...' : editingBookingId ? 'Save Changes' : 'Submit Booking'}
                       </Button>
                       <Button
                         type="button"
@@ -475,7 +511,7 @@ const BookingPage = () => {
                         onClick={resetBookingForm}
                         disabled={submitting}
                       >
-                        Reset
+                        {editingBookingId ? 'Cancel Edit' : 'Reset'}
                       </Button>
                     </div>
                   </Form>
@@ -618,13 +654,22 @@ const BookingPage = () => {
                             )}
 
                             {(booking.status === 'PENDING' || booking.status === 'APPROVED') && (
-                              <Button
-                                size="sm"
-                                variant="outline-secondary"
-                                onClick={() => handleStatusUpdate(booking.id, 'CANCELLED')}
-                              >
-                                Cancel
-                              </Button>
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline-primary"
+                                  onClick={() => handleEditBooking(booking)}
+                                >
+                                  Edit
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline-secondary"
+                                  onClick={() => handleStatusUpdate(booking.id, 'CANCELLED')}
+                                >
+                                  Cancel
+                                </Button>
+                              </>
                             )}
 
                             {(booking.status === 'REJECTED' || booking.status === 'CANCELLED') && (
