@@ -6,6 +6,8 @@
 ### Core Features
    **CRUD Operations**: Create, Read, Update, Delete resources
    **Search & Filter**: Filter by type, location, capacity, and status
+  **Booking Workflow**: Create, review, update, approve, reject, cancel, and delete bookings
+  **Conflict Checking**: Prevent overlapping bookings on the same resource and date
    **Smart Suitability Badge**: Intelligent resource recommendations
    **RESTful API**: Clean Spring Boot backend with proper HTTP methods
    **Modern UI**: React frontend with Bootstrap styling
@@ -67,6 +69,19 @@ PAF_Assignment/
 | PUT | `/api/resources/{id}` | Update resource |
 | DELETE | `/api/resources/{id}` | Delete resource |
 | GET | `/api/resources/search` | Search/filter resources |
+| POST | `/api/bookings` | Create booking request |
+| GET | `/api/bookings` | Get all bookings (optional filters) |
+| GET | `/api/bookings/{id}` | Get booking by ID |
+| PUT | `/api/bookings/{id}` | Update booking details |
+| PATCH | `/api/bookings/{id}/status` | Update booking status |
+| DELETE | `/api/bookings/{id}` | Delete booking |
+
+### Booking Query Filters
+
+`GET /api/bookings` supports:
+- `resourceId`
+- `bookingDate` (`yyyy-MM-dd`)
+- `status` (`PENDING`, `APPROVED`, `REJECTED`, `CANCELLED`)
 
 ## Setup Instructions
 
@@ -104,6 +119,30 @@ The system includes 10 sample resources with various types and configurations:
 - Equipment resources
 
 ## Usage Examples
+
+### Create Booking
+```bash
+POST /api/bookings
+{
+  "resourceId": "<resource-id>",
+  "bookedByName": "Jane Doe",
+  "bookedByEmail": "jane@example.com",
+  "purpose": "Final year project presentation",
+  "attendeeCount": 20,
+  "bookingDate": "2026-04-20",
+  "startTime": "10:00",
+  "endTime": "11:00",
+  "notes": "Need projector and microphone"
+}
+```
+
+### Update Booking Status
+```bash
+PATCH /api/bookings/{id}/status
+{
+  "status": "APPROVED"
+}
+```
 
 ### Search Resources
 ```bash
@@ -183,6 +222,49 @@ Import the following collection for testing:
   ]
 }
 ```
+
+### Booking API Smoke Test Flow
+1. Create booking: `POST /api/bookings` (expect `201 Created` and `PENDING` status)
+2. Fetch booking: `GET /api/bookings/{id}` (expect same booking data)
+3. Approve booking: `PATCH /api/bookings/{id}/status` with `APPROVED`
+4. Cancel booking: `PATCH /api/bookings/{id}/status` with `CANCELLED`
+5. Verify list: `GET /api/bookings` includes updated status
+
+## Booking Validation and Conflict Rules
+
+### Backend Validation
+- Booking date must be today or a future date
+- Start time must be earlier than end time
+- Attendee count must be positive and within selected resource capacity
+- Booking time must be within resource available window
+- Only `ACTIVE` resources can be booked
+
+### Conflict Checking
+- Conflicts are checked against `PENDING` and `APPROVED` bookings
+- Conflict key: same resource + same booking date + overlapping time range
+- Overlap rule: existing start < requested end AND existing end > requested start
+
+### Status Workflow
+- Default new status: `PENDING`
+- Supported statuses: `PENDING`, `APPROVED`, `REJECTED`, `CANCELLED`
+- `CANCELLED` and `REJECTED` bookings cannot transition further
+- `APPROVED` bookings cannot transition to `REJECTED`
+
+### Frontend Booking UX Validation
+- Date picker blocks past dates
+- Client validation enforces `startTime < endTime`
+- Client validation enforces attendee count <= selected resource capacity
+- Backend field validation errors are shown as per-field messages
+- Reset action clears form values and validation/feedback state
+
+## Member Contributions
+
+### Member 2: Booking Workflow + Conflict Checking
+- Designed booking data model and DTO-based request/response flow
+- Implemented booking endpoints for create/read/update/status update/delete
+- Implemented booking conflict detection and status transition rules
+- Added booking UI page with queue, filters, approval actions, and conflict preview
+- Added frontend validation and backend error mapping for user-friendly feedback
 
 ## Error Handling
 
