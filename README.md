@@ -17,8 +17,8 @@
 
 ### Backend
 - **Spring Boot 3.2.5** - REST API framework
-- **Spring Data JPA** - Database operations
-- **MySQL** - Database
+- **Spring Data MongoDB** - Database operations
+- **MongoDB** - NoSQL Database (Atlas cluster)
 - **Validation** - Input validation
 - **Lombok** - Boilerplate reduction
 
@@ -37,8 +37,8 @@ PAF_Assignment/
 │   ├── src/main/java/com/groupxx/smartcampus/
 │   │   ├── controller/         # REST controllers
 │   │   ├── service/           # Business logic
-│   │   ├── repository/        # Data access
-│   │   ├── entity/            # JPA entities
+│   │   ├── repository/        # MongoDB repositories
+│   │   ├── entity/            # MongoDB documents
 │   │   ├── dto/               # Data transfer objects
 │   │   ├── enums/             # Enums
 │   │   └── exception/         # Exception handling
@@ -88,13 +88,16 @@ PAF_Assignment/
 ### Prerequisites
 - Java 17+
 - Node.js 18+
-- MySQL 8.0+
+- MongoDB 4.4+ (or MongoDB Atlas account)
 - Maven 3.6+
 
 ### Database Setup
-1. Create MySQL database: `smart_campus_db`
-2. Update database credentials in `smart-campus-api/src/main/resources/application.properties`
-3. The application will auto-create tables on startup
+1. MongoDB Atlas: Create a cluster and get the connection URI
+2. Update MongoDB connection URI in `smart-campus-api/src/main/resources/application.properties`:
+   ```properties
+   spring.data.mongodb.uri=mongodb+srv://username:password@cluster.mongodb.net/smart_campus_db?retryWrites=true&w=majority
+   ```
+3. The application will auto-create collections on startup
 
 ### Backend Setup
 ```bash
