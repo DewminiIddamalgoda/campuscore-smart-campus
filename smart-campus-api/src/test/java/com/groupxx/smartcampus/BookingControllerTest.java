@@ -18,6 +18,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.*;
 import java.time.LocalTime;
 import java.util.Collections;
 
@@ -113,7 +116,7 @@ public class BookingControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(bookingRequestDto)))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").contains("already has a booking"));
+                .andExpect(jsonPath("$.message").value(containsString("already has a booking")));
     }
 
     @Test
@@ -207,7 +210,7 @@ public class BookingControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusUpdateDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").contains("cannot change status"));
+                .andExpect(jsonPath("$.message").value(containsString("cannot change status")));
     }
 
     @Test
@@ -221,7 +224,7 @@ public class BookingControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusUpdateDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").contains("cannot be rejected"));
+                .andExpect(jsonPath("$.message").value(containsString("cannot be rejected")));
     }
 
     @Test
@@ -232,7 +235,7 @@ public class BookingControllerTest {
 
     @Test
     public void testGetBookingsByResourceIdFilter() throws Exception {
-        when(bookingService.getAllBookings(eq("resource-123"), null, null))
+        when(bookingService.getAllBookings(eq("resource-123"), isNull(), isNull()))
                 .thenReturn(Collections.singletonList(bookingResponseDto));
 
         mockMvc.perform(get("/bookings?resourceId=resource-123"))
@@ -242,7 +245,7 @@ public class BookingControllerTest {
 
     @Test
     public void testGetBookingsByStatusFilter() throws Exception {
-        when(bookingService.getAllBookings(null, null, eq(BookingStatus.PENDING)))
+        when(bookingService.getAllBookings(isNull(), isNull(), eq(BookingStatus.PENDING)))
                 .thenReturn(Collections.singletonList(bookingResponseDto));
 
         mockMvc.perform(get("/bookings?status=PENDING"))
