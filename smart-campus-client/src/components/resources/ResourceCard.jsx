@@ -32,11 +32,13 @@ const ResourceCard = ({ resource }) => {
     navigate(`/resources/${resource.id}`);
   };
 
- const handleBooking = () => {
-  console.log('Booking clicked for resource:', resource.id);
-  console.log('Navigating to:', `/bookings`);
-  navigate(`/bookings`);
-};
+    const handleBooking = () => {
+      console.log('Booking clicked for resource:', resource.id);
+      console.log('Navigating to:', `/bookings?resourceId=${resource.id}`);
+      navigate(`/bookings?resourceId=${encodeURIComponent(resource.id)}`, {
+        state: { selectedResourceId: resource.id }
+      });
+    };
 
   return (
     <div className="resource-card-modern">
@@ -95,11 +97,11 @@ const ResourceCard = ({ resource }) => {
           <i className="fa fa-eye me-2"></i>View Details
         </Button>
         <Button
-        className="secondary-btn"
-        onClick={handleBooking}
-      >
-        <i className="fa fa-calendar-check me-2"></i>Book Now
-      </Button>
+          className="secondary-btn"
+          onClick={handleBooking}
+        >
+          <i className="fa fa-calendar-check me-2"></i>Book Now
+        </Button>
       </div>
     </div>
   );
