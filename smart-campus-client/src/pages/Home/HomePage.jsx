@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../../components/layout/Navbar';
 import { Link } from 'react-router-dom';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import './HomePage.css';
@@ -120,6 +119,39 @@ const HomePage = () => {
       author: 'Team Module',
       badgeClass: 'badge-support',
     },
+    {
+      image: '/images/module4.png',
+      icon: 'fa-bar-chart',
+      title: 'Reports & Analytics',
+      subtitle: 'Insight Module',
+      tag: 'Advanced Module',
+      description:
+        'Generate reports on bookings, resource usage, space utilization, and maintenance trends for better planning.',
+      author: 'Analytics Module',
+      badgeClass: 'badge-analytics',
+    },
+    {
+      image: '/images/module5.jpg',
+      icon: 'fa-user-circle',
+      title: 'User & Role Management',
+      subtitle: 'Security Module',
+      tag: 'Admin Module',
+      description:
+        'Control user accounts, permissions, and role-based access for administrators, staff, technicians, and students.',
+      author: 'Admin Module',
+      badgeClass: 'badge-admin',
+    },
+    {
+      image: '/images/module6.jpg',
+      icon: 'fa-bell',
+      title: 'Announcements & Alerts',
+      subtitle: 'Communication Module',
+      tag: 'Support Module',
+      description:
+        'Send booking reminders, system alerts, maintenance announcements, and important platform updates to users.',
+      author: 'Communication Module',
+      badgeClass: 'badge-communication',
+    },
   ];
 
   const testimonials = [
@@ -146,6 +178,39 @@ const HomePage = () => {
       comment:
         'Having resource information and maintenance-related details connected in one platform improves efficiency a lot.',
       rating: 4,
+    },
+  ];
+
+  const faqs = [
+    {
+      question: 'What is CampusCore used for?',
+      answer:
+        'CampusCore is used to manage campus resources such as lecture halls, laboratories, meeting rooms, and equipment through one centralized system.',
+    },
+    {
+      question: 'Who can use this platform?',
+      answer:
+        'Administrators, academic staff, technicians, and students can use the system based on their assigned roles and permissions.',
+    },
+    {
+      question: 'Can users check resource availability before booking?',
+      answer:
+        'Yes. The platform allows users to view availability, status, and booking windows before submitting a request.',
+    },
+    {
+      question: 'Does the system handle maintenance issues?',
+      answer:
+        'Yes. Maintenance incidents, technician comments, progress updates, and notifications can all be managed within the system.',
+    },
+    {
+      question: 'Can the platform prevent booking conflicts?',
+      answer:
+        'Yes. The booking workflow is designed to reduce overlapping requests and support approval-based scheduling decisions.',
+    },
+    {
+      question: 'What technologies are used in this project?',
+      answer:
+        'This platform is designed as a modern web application using React for the frontend and Spring Boot for backend services.',
     },
   ];
 
@@ -223,8 +288,7 @@ const HomePage = () => {
               <Link to="/resources" onClick={() => setMenuOpen(false)}>Resources</Link>
               <Link to="/bookings" onClick={() => setMenuOpen(false)}>Bookings</Link>
               <a href="#testimonial" className="smoothScroll">Reviews</a>
-              <a href="#contact" className="smoothScroll">Contact</a>
-              <a href="#login" className="sc-nav-phone">Login</a>
+              <a href="#faq" className="smoothScroll">FAQ</a>
             </div>
           </div>
         </Container>
@@ -478,34 +542,32 @@ const HomePage = () => {
         </Container>
       </section>
 
-      <section id="contact" className="section-block section-light">
+      <section id="faq" className="section-block section-light">
         <Container>
-          <Row className="align-items-center g-4">
-            <Col lg={6} md={12}>
-              <div className="contact-box modern-card">
-                <span className="section-label">Contact Us</span>
-                <h2>For project demo or more details</h2>
-                <form>
-                  <input type="text" className="modern-input" placeholder="Enter full name" required />
-                  <input type="email" className="modern-input" placeholder="Enter email address" required />
-                  <textarea className="modern-input modern-textarea" rows={6} placeholder="Enter your message" required />
-                  <Button className="modern-btn" variant="primary">
-                    Send Message
-                  </Button>
-                </form>
-              </div>
-            </Col>
+          <div className="section-header text-center">
+            <span className="section-label">Frequently Asked Questions</span>
+            <h2>Common questions about the platform</h2>
+            <p>
+              Here are some quick answers about how CampusCore supports campus resource
+              management and operations.
+            </p>
+          </div>
 
-            <Col lg={6} md={12}>
-              <div className="contact-image-card modern-card">
-                <img src="/images/slider-img1.jpg" alt="Smart Campus Contact" className="contact-image" />
-              </div>
-            </Col>
+          <Row>
+            {faqs.map((faq, index) => (
+              <Col key={index} lg={6} md={12} className="mb-4">
+                <div className="modern-card faq-card">
+                  <div className="faq-icon">
+                    <i className="fa fa-question-circle" />
+                  </div>
+                  <h3>{faq.question}</h3>
+                  <p>{faq.answer}</p>
+                </div>
+              </Col>
+            ))}
           </Row>
         </Container>
       </section>
-
-      
     </div>
   );
 };
