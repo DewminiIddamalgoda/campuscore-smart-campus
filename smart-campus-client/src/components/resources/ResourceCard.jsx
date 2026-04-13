@@ -18,11 +18,11 @@ const ResourceCard = ({ resource }) => {
 
   const getTypeIcon = (type) => {
     switch (type) {
-      case 'LECTURE_HALL': return '🎓';
-      case 'LAB': return '🔬';
-      case 'MEETING_ROOM': return '👥';
-      case 'EQUIPMENT': return '📦';
-      default: return '🏢';
+      case 'LECTURE_HALL': return '';
+      case 'LAB': return '';
+      case 'MEETING_ROOM': return '';
+      case 'EQUIPMENT': return '';
+      default: return '';
     }
   };
 
@@ -32,11 +32,11 @@ const ResourceCard = ({ resource }) => {
     navigate(`/resources/${resource.id}`);
   };
 
-  const handleEdit = () => {
-    console.log('Edit clicked for resource:', resource.id);
-    console.log('Navigating to:', `/resources/edit/${resource.id}`);
-    navigate(`/resources/edit/${resource.id}`);
-  };
+ const handleBooking = () => {
+  console.log('Booking clicked for resource:', resource.id);
+  console.log('Navigating to:', `/bookings`);
+  navigate(`/bookings`);
+};
 
   return (
     <div className="resource-card-modern">
@@ -94,12 +94,12 @@ const ResourceCard = ({ resource }) => {
         >
           <i className="fa fa-eye me-2"></i>View Details
         </Button>
-        <Button 
-          className="secondary-btn"
-          onClick={handleEdit}
-        >
-          <i className="fa fa-edit me-2"></i>Book Now 
-        </Button>
+        <Button
+        className="secondary-btn"
+        onClick={handleBooking}
+      >
+        <i className="fa fa-calendar-check me-2"></i>Book Now
+      </Button>
       </div>
     </div>
   );

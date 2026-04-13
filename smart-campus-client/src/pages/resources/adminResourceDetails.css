@@ -1,0 +1,65 @@
+/* Admin Resource Details Page Specific Styles */
+
+/* Override the default resources-page styles for admin details */
+.admin-resource-details .resources-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 100%);
+  padding-top: 0;
+  margin-top: 0px; /* Reduced white space */
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* Override container styles for admin details */
+.admin-resource-details .resources-page .container-fluid {
+  padding-left: 30px;
+  padding-right: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header section adjustments */
+.admin-resource-details .resources-header {
+  padding: 40px 0 30px; /* Reduced padding */
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(29, 78, 216, 0.9));
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Content section adjustments */
+.admin-resource-details .resources-content {
+  padding: 30px 0; /* Reduced padding */
+}
+
+/* Card adjustments for better spacing */
+.admin-resource-details .modern-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+  margin-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .admin-resource-details .resources-page {
+    margin-top: 60px;
+  }
+  
+  .admin-resource-details .resources-page .container-fluid {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  
+  .admin-resource-details .resources-header {
+    padding: 30px 0 20px;
+  }
+  
+  .admin-resource-details .resources-content {
+    padding: 20px 0;
+  }
+}

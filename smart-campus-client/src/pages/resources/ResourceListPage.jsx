@@ -3,8 +3,8 @@ import { Container, Row, Col, Button, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { FaPlus, FaSearch, FaFilter } from 'react-icons/fa';
-import ResourceCard from '../../components/ResourceCard';
-import ResourceFilter from '../../components/ResourceFilter';
+import ResourceCard from '../../components/resources/ResourceCard';
+import ResourceFilter from '../../components/resources/ResourceFilter';
 import resourceApi from "../../api/resourceApi";
 import './Resources.css';
 

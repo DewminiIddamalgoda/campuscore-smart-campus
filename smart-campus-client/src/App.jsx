@@ -4,12 +4,14 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import AdminLayout from './components/admin/AdminLayout';
 import HomePage from './pages/Home/HomePage';
+import BookingPage from './pages/bookings/BookingPage';
 import ResourceListPage from './pages/resources/ResourceListPage';
 import ResourceDetailsPage from './pages/resources/ResourceDetailsPage';
 import AddResourcePage from './pages/resources/AddResourcePage';
 import EditResourcePage from './pages/resources/EditResourcePage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminResources from './pages/admin/AdminResources';
+import AdminResourceDetails from './pages/resources/adminResourceDetails';
 import TestPage from './pages/TestPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -40,6 +42,7 @@ function App() {
         <Routes>
           {/* User Routes */}
           <Route path="/" element={<UserLayout><HomePage /></UserLayout>} />
+          <Route path="/bookings" element={<UserLayout><BookingPage /></UserLayout>} />
           <Route path="/resources" element={<UserLayout><ResourceListPage /></UserLayout>} />
           <Route path="/resources/:id" element={<UserLayout><ResourceDetailsPage /></UserLayout>} />
           <Route path="/resources/add" element={<UserLayout><AddResourcePage /></UserLayout>} />
@@ -48,6 +51,7 @@ function App() {
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={<AdminLayoutWrapper><AdminDashboard /></AdminLayoutWrapper>} />
           <Route path="/admin/resources" element={<AdminLayoutWrapper><AdminResources /></AdminLayoutWrapper>} />
+          <Route path="/admin/resources/:id" element={<AdminLayoutWrapper><AdminResourceDetails /></AdminLayoutWrapper>} />
           
           {/* Test Routes */}
           <Route path="/test" element={<TestPage />} />

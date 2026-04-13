@@ -49,6 +49,7 @@ const Header = ({ isAdmin = false }) => {
             <a href="#about" className="smoothScroll" onClick={handleSmoothScroll}>About</a>
             <a href="#feature" className="smoothScroll" onClick={handleSmoothScroll}>Features</a>
             <Link to="/resources" onClick={() => setMenuOpen(false)}>Resources</Link>
+            <Link to="/bookings" onClick={() => setMenuOpen(false)}>Bookings</Link>
             <a href="#testimonial" className="smoothScroll" onClick={handleSmoothScroll}>Reviews</a>
             <a href="#contact" className="smoothScroll" onClick={handleSmoothScroll}>Contact</a>
             
