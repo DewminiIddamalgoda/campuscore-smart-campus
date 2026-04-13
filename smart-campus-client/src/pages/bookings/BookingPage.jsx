@@ -35,6 +35,9 @@ const BookingPage = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
+  const [validationErrors, setValidationErrors] = useState({});
+
+  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   const activeResources = useMemo(
     () => resources.filter((resource) => resource.status === 'ACTIVE'),
@@ -112,16 +115,69 @@ const BookingPage = () => {
 
   const handleFormChange = (event) => {
     const { name, value } = event.target;
+
+    setValidationErrors((current) => {
+      if (!current[name] && name !== 'startTime' && name !== 'endTime') {
+        return current;
+      }
+
+      const next = { ...current };
+      delete next[name];
+
+      if (name === 'startTime' || name === 'endTime') {
+        delete next.startTime;
+        delete next.endTime;
+      }
+
+      return next;
+    });
+
     setFormData((current) => ({
       ...current,
       [name]: value
     }));
   };
 
+  const validateClientForm = () => {
+    const errors = {};
+
+    if (formData.bookingDate && formData.bookingDate < today) {
+      errors.bookingDate = 'Booking date must be today or later';
+    }
+
+    if (formData.startTime && formData.endTime && formData.startTime >= formData.endTime) {
+      errors.endTime = 'End time must be later than start time';
+    }
+
+    if (selectedResource?.capacity != null && Number(formData.attendeeCount) > selectedResource.capacity) {
+      errors.attendeeCount = `Attendee count cannot exceed capacity (${selectedResource.capacity})`;
+    }
+
+    return errors;
+  };
+
+  const resetBookingForm = () => {
+    setFormData(EMPTY_FORM);
+    setValidationErrors({});
+    setFeedback({ type: '', message: '' });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitting(true);
     setFeedback({ type: '', message: '' });
+    setValidationErrors({});
+
+    const clientErrors = validateClientForm();
+    if (Object.keys(clientErrors).length > 0) {
+      setValidationErrors(clientErrors);
+      setFeedback({
+        type: 'danger',
+        message: Object.values(clientErrors)[0]
+      });
+      setSubmitting(false);
+      return;
+    }
 
     try {
       await bookingApi.createBooking({
@@ -130,13 +186,20 @@ const BookingPage = () => {
       });
 
       setFormData(EMPTY_FORM);
+      setValidationErrors({});
       await refreshBookings();
       setFeedback({
         type: 'success',
         message: 'Booking request submitted successfully.'
       });
     } catch (error) {
+      const backendFieldErrors = error?.response?.data?.errors;
+      if (backendFieldErrors && typeof backendFieldErrors === 'object') {
+        setValidationErrors(backendFieldErrors);
+      }
+
       const serverMessage =
+        (backendFieldErrors && Object.values(backendFieldErrors)[0]) ||
         error?.response?.data?.message ||
         error?.response?.data?.details ||
         'Unable to create the booking right now.';
@@ -237,6 +300,7 @@ const BookingPage = () => {
                             name="resourceId"
                             value={formData.resourceId}
                             onChange={handleFormChange}
+                            isInvalid={Boolean(validationErrors.resourceId)}
                             required
                           >
                             <option value="">Select a resource</option>
@@ -246,6 +310,9 @@ const BookingPage = () => {
                               </option>
                             ))}
                           </Form.Select>
+                          <Form.Control.Feedback type="invalid">
+                            {validationErrors.resourceId}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Col>
 
@@ -256,9 +323,13 @@ const BookingPage = () => {
                             name="bookedByName"
                             value={formData.bookedByName}
                             onChange={handleFormChange}
+                            isInvalid={Boolean(validationErrors.bookedByName)}
                             placeholder="Your name"
                             required
                           />
+                          <Form.Control.Feedback type="invalid">
+                            {validationErrors.bookedByName}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Col>
 
@@ -270,9 +341,13 @@ const BookingPage = () => {
                             name="bookedByEmail"
                             value={formData.bookedByEmail}
                             onChange={handleFormChange}
+                            isInvalid={Boolean(validationErrors.bookedByEmail)}
                             placeholder="name@example.com"
                             required
                           />
+                          <Form.Control.Feedback type="invalid">
+                            {validationErrors.bookedByEmail}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Col>
 
@@ -283,9 +358,13 @@ const BookingPage = () => {
                             name="purpose"
                             value={formData.purpose}
                             onChange={handleFormChange}
+                            isInvalid={Boolean(validationErrors.purpose)}
                             placeholder="Lecture, presentation, lab session..."
                             required
                           />
+                          <Form.Control.Feedback type="invalid">
+                            {validationErrors.purpose}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Col>
 
@@ -295,11 +374,16 @@ const BookingPage = () => {
                           <Form.Control
                             type="number"
                             min="1"
+                            max={selectedResource?.capacity || undefined}
                             name="attendeeCount"
                             value={formData.attendeeCount}
                             onChange={handleFormChange}
+                            isInvalid={Boolean(validationErrors.attendeeCount)}
                             required
                           />
+                          <Form.Control.Feedback type="invalid">
+                            {validationErrors.attendeeCount}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Col>
 
@@ -311,8 +395,13 @@ const BookingPage = () => {
                             name="bookingDate"
                             value={formData.bookingDate}
                             onChange={handleFormChange}
+                            min={today}
+                            isInvalid={Boolean(validationErrors.bookingDate)}
                             required
                           />
+                          <Form.Control.Feedback type="invalid">
+                            {validationErrors.bookingDate}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Col>
 
@@ -324,8 +413,12 @@ const BookingPage = () => {
                             name="startTime"
                             value={formData.startTime}
                             onChange={handleFormChange}
+                            isInvalid={Boolean(validationErrors.startTime)}
                             required
                           />
+                          <Form.Control.Feedback type="invalid">
+                            {validationErrors.startTime}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Col>
 
@@ -337,8 +430,12 @@ const BookingPage = () => {
                             name="endTime"
                             value={formData.endTime}
                             onChange={handleFormChange}
+                            isInvalid={Boolean(validationErrors.endTime)}
                             required
                           />
+                          <Form.Control.Feedback type="invalid">
+                            {validationErrors.endTime}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Col>
 
@@ -375,7 +472,7 @@ const BookingPage = () => {
                       <Button
                         type="button"
                         variant="outline-secondary"
-                        onClick={() => setFormData(EMPTY_FORM)}
+                        onClick={resetBookingForm}
                         disabled={submitting}
                       >
                         Reset
