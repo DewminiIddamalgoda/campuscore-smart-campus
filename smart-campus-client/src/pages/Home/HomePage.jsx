@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Header from '../../components/layout/Navbar';
 import { Link } from 'react-router-dom';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import './HomePage.css';
@@ -94,7 +95,7 @@ const HomePage = () => {
       tag: 'Core Module',
       description:
         'Manage resources with metadata such as type, capacity, location, status, and availability.',
-      author: 'Your Component',
+      author: 'Module',
       badgeClass: 'badge-active',
     },
     {
@@ -102,7 +103,7 @@ const HomePage = () => {
       icon: 'fa-calendar',
       title: 'Booking Management',
       subtitle: 'Workflow Module',
-      tag: 'Team Module',
+      tag: 'Module',
       description:
         'Handle booking requests, approvals, rejections, cancellations, and scheduling conflict prevention.',
       author: 'Team Module',
@@ -113,7 +114,7 @@ const HomePage = () => {
       icon: 'fa-wrench',
       title: 'Incident & Notifications',
       subtitle: 'Support Module',
-      tag: 'Team Module',
+      tag: 'Module',
       description:
         'Track maintenance tickets, comments, technician updates, and user notifications in one place.',
       author: 'Team Module',
@@ -220,6 +221,7 @@ const HomePage = () => {
               <a href="#about" className="smoothScroll">About</a>
               <a href="#feature" className="smoothScroll">Features</a>
               <Link to="/resources" onClick={() => setMenuOpen(false)}>Resources</Link>
+              <Link to="/bookings" onClick={() => setMenuOpen(false)}>Bookings</Link>
               <a href="#testimonial" className="smoothScroll">Reviews</a>
               <a href="#contact" className="smoothScroll">Contact</a>
               <a href="#login" className="sc-nav-phone">Login</a>
@@ -496,7 +498,7 @@ const HomePage = () => {
 
             <Col lg={6} md={12}>
               <div className="contact-image-card modern-card">
-                <img src="/images/contact-image.jpg" alt="Smart Campus Contact" className="contact-image" />
+                <img src="/images/slider-img1.jpg" alt="Smart Campus Contact" className="contact-image" />
               </div>
             </Col>
           </Row>

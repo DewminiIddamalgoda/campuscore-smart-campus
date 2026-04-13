@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Row,
@@ -28,6 +29,7 @@ import {
 import resourceApi from '../../api/resourceApi';
 
 const AdminResources = () => {
+  const navigate = useNavigate();
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -355,7 +357,7 @@ const AdminResources = () => {
                               <FaTrash className="me-2" />
                               Delete
                             </Dropdown.Item>
-                            <Dropdown.Item>
+                            <Dropdown.Item onClick={() => navigate(`/admin/resources/${resource.id}`)}>
                               <FaEye className="me-2" />
                               View Details
                             </Dropdown.Item>

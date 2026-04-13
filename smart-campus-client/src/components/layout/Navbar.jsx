@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
+import './Header.css';
 
-const Navbar = () => {
+const Header = ({ isAdmin = false }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleSmoothScroll = (e) => {
     const href = e.currentTarget.getAttribute('href');
@@ -17,6 +19,11 @@ const Navbar = () => {
       targetElement.scrollIntoView({ behavior: 'smooth' });
       setMenuOpen(false);
     }
+  };
+
+  const handleLogout = () => {
+    // Add logout logic here
+    navigate('/');
   };
 
   return (
@@ -42,9 +49,19 @@ const Navbar = () => {
             <a href="#about" className="smoothScroll" onClick={handleSmoothScroll}>About</a>
             <a href="#feature" className="smoothScroll" onClick={handleSmoothScroll}>Features</a>
             <Link to="/resources" onClick={() => setMenuOpen(false)}>Resources</Link>
+            <Link to="/bookings" onClick={() => setMenuOpen(false)}>Bookings</Link>
             <a href="#testimonial" className="smoothScroll" onClick={handleSmoothScroll}>Reviews</a>
             <a href="#contact" className="smoothScroll" onClick={handleSmoothScroll}>Contact</a>
-            <a href="#login" className="sc-nav-phone">Login</a>
+            
+            {isAdmin ? (
+              <>
+                <Link to="/admin/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+                <Link to="/admin/resources" onClick={() => setMenuOpen(false)}>Manage</Link>
+                <a href="#/" onClick={(e) => { e.preventDefault(); handleLogout(); setMenuOpen(false); }}>Logout</a>
+              </>
+            ) : (
+              <Link to="/admin/login" onClick={() => setMenuOpen(false)} className="sc-nav-phone">Admin Login</Link>
+            )}
           </div>
         </div>
       </Container>
@@ -52,4 +69,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default Header;

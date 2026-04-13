@@ -11,6 +11,7 @@ import AddResourcePage from './pages/resources/AddResourcePage';
 import EditResourcePage from './pages/resources/EditResourcePage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminResources from './pages/admin/AdminResources';
+import AdminResourceDetails from './pages/resources/adminResourceDetails';
 import TestPage from './pages/TestPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -50,6 +51,7 @@ function App() {
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={<AdminLayoutWrapper><AdminDashboard /></AdminLayoutWrapper>} />
           <Route path="/admin/resources" element={<AdminLayoutWrapper><AdminResources /></AdminLayoutWrapper>} />
+          <Route path="/admin/resources/:id" element={<AdminLayoutWrapper><AdminResourceDetails /></AdminLayoutWrapper>} />
           
           {/* Test Routes */}
           <Route path="/test" element={<TestPage />} />
