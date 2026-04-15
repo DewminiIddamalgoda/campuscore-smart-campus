@@ -19,5 +19,9 @@ public interface BookingService {
 
     BookingResponseDto updateBookingStatus(String id, BookingStatus status);
 
+    BookingResponseDto issueQrForBooking(String id);
+
+    BookingResponseDto checkInWithQrToken(String token);
+
     void deleteBooking(String id);
 }

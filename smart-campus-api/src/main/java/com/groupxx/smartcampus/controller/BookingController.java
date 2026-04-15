@@ -1,6 +1,7 @@
 package com.groupxx.smartcampus.controller;
 
 import com.groupxx.smartcampus.dto.BookingRequestDto;
+import com.groupxx.smartcampus.dto.BookingQrCheckInRequestDto;
 import com.groupxx.smartcampus.dto.BookingResponseDto;
 import com.groupxx.smartcampus.dto.BookingStatusUpdateDto;
 import com.groupxx.smartcampus.enums.BookingStatus;
@@ -51,6 +52,16 @@ public class BookingController {
     public ResponseEntity<BookingResponseDto> updateBookingStatus(@PathVariable String id,
                                                                   @Valid @RequestBody BookingStatusUpdateDto statusDto) {
         return ResponseEntity.ok(bookingService.updateBookingStatus(id, statusDto.getStatus()));
+    }
+
+    @PostMapping("/{id}/qr")
+    public ResponseEntity<BookingResponseDto> issueQrForBooking(@PathVariable String id) {
+        return ResponseEntity.ok(bookingService.issueQrForBooking(id));
+    }
+
+    @PostMapping("/check-in")
+    public ResponseEntity<BookingResponseDto> checkInWithQrToken(@Valid @RequestBody BookingQrCheckInRequestDto checkInDto) {
+        return ResponseEntity.ok(bookingService.checkInWithQrToken(checkInDto.getToken()));
     }
 
     @DeleteMapping("/{id}")

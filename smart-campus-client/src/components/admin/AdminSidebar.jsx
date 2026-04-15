@@ -1,11 +1,12 @@
 import React from 'react';
 import { Nav } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  FaTachometerAlt, 
-  FaBoxOpen, 
-  FaChartBar, 
-  FaUsers, 
+import {
+  FaTachometerAlt,
+  FaBoxOpen,
+  FaChartBar,
+  FaQrcode,
+  FaUsers,
   FaTools,
   FaBell,
   FaCog
@@ -28,6 +29,11 @@ const AdminSidebar = () => {
       path: '/admin/resources',
       icon: <FaBoxOpen />,
       label: 'Resources'
+    },
+    {
+      path: '/admin/check-in',
+      icon: <FaQrcode />,
+      label: 'QR Check-in'
     },
     {
       path: '/admin/analytics',

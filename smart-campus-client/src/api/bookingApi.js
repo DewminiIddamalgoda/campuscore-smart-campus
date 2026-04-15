@@ -34,6 +34,16 @@ const bookingApi = {
     return response.data;
   },
 
+  issueBookingQr: async (id) => {
+    const response = await axios.post(`${API_BASE_URL}/bookings/${id}/qr`);
+    return response.data;
+  },
+
+  checkInBookingQr: async (token) => {
+    const response = await axios.post(`${API_BASE_URL}/bookings/check-in`, { token });
+    return response.data;
+  },
+
   deleteBooking: async (id) => {
     await axios.delete(`${API_BASE_URL}/bookings/${id}`);
   }
