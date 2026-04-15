@@ -36,6 +36,8 @@ public class Booking {
 
     private String notes;
 
+    private String rejectionReason;
+
     private String qrToken;
 
     private LocalDateTime qrIssuedAt;
@@ -82,6 +84,9 @@ public class Booking {
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
+
+    public String getRejectionReason() { return rejectionReason; }
+    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
 
     public String getQrToken() { return qrToken; }
     public void setQrToken(String qrToken) { this.qrToken = qrToken; }

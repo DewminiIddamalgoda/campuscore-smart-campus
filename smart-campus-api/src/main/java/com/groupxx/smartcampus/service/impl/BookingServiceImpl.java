@@ -181,6 +181,38 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.delete(booking);
     }
 
+    @Override
+    public BookingResponseDto reviewBooking(String id, BookingStatus status, String rejectionReason) {
+        Booking booking = getBookingEntityById(id);
+        validateStatusTransition(booking, status);
+
+        if (status == BookingStatus.APPROVED) {
+            Resource resource = getActiveResource(booking.getResourceId());
+            validateConflict(booking.getId(), resource, booking.getBookingDate(), booking.getStartTime(), booking.getEndTime());
+        }
+
+        booking.setStatus(status);
+
+        if (status == BookingStatus.REJECTED) {
+            booking.setRejectionReason(rejectionReason);
+            clearQrData(booking);
+        } else if (status == BookingStatus.APPROVED) {
+            booking.setRejectionReason(null);
+        } else if (status != BookingStatus.APPROVED) {
+            clearQrData(booking);
+        }
+
+        return convertToResponseDto(bookingRepository.save(booking));
+    }
+
+    @Override
+    public List<BookingResponseDto> getUserBookings(String email) {
+        List<Booking> bookings = bookingRepository.findByBookedByEmailOrderByBookingDateDescStartTimeDesc(email);
+        return bookings.stream()
+                .map(this::convertToResponseDto)
+                .collect(Collectors.toList());
+    }
+
     private Booking getBookingEntityById(String id) {
         return bookingRepository.findById(id)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found with id: " + id));

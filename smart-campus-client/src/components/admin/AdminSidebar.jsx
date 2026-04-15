@@ -6,6 +6,7 @@ import {
   FaBoxOpen,
   FaChartBar,
   FaQrcode,
+  FaCalendarCheck,
   FaUsers,
   FaTools,
   FaBell,
@@ -34,6 +35,11 @@ const AdminSidebar = () => {
       path: '/admin/check-in',
       icon: <FaQrcode />,
       label: 'QR Check-in'
+    },
+    {
+      path: '/admin/bookings',
+      icon: <FaCalendarCheck />,
+      label: 'Booking Requests'
     },
     {
       path: '/admin/analytics',

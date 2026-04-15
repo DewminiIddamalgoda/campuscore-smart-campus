@@ -23,5 +23,9 @@ public interface BookingService {
 
     BookingResponseDto checkInWithQrToken(String token);
 
+    BookingResponseDto reviewBooking(String id, BookingStatus status, String rejectionReason);
+
+    List<BookingResponseDto> getUserBookings(String email);
+
     void deleteBooking(String id);
 }

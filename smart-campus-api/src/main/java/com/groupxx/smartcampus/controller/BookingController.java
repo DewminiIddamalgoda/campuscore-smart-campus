@@ -4,6 +4,7 @@ import com.groupxx.smartcampus.dto.BookingRequestDto;
 import com.groupxx.smartcampus.dto.BookingQrCheckInRequestDto;
 import com.groupxx.smartcampus.dto.BookingResponseDto;
 import com.groupxx.smartcampus.dto.BookingStatusUpdateDto;
+import com.groupxx.smartcampus.dto.BookingReviewDto;
 import com.groupxx.smartcampus.enums.BookingStatus;
 import com.groupxx.smartcampus.service.BookingService;
 import jakarta.validation.Valid;
@@ -68,5 +69,16 @@ public class BookingController {
     public ResponseEntity<Void> deleteBooking(@PathVariable String id) {
         bookingService.deleteBooking(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/review")
+    public ResponseEntity<BookingResponseDto> reviewBooking(@PathVariable String id,
+                                                            @Valid @RequestBody BookingReviewDto reviewDto) {
+        return ResponseEntity.ok(bookingService.reviewBooking(id, reviewDto.getStatus(), reviewDto.getRejectionReason()));
+    }
+
+    @GetMapping("/user/{email}")
+    public ResponseEntity<List<BookingResponseDto>> getUserBookings(@PathVariable String email) {
+        return ResponseEntity.ok(bookingService.getUserBookings(email));
     }
 }

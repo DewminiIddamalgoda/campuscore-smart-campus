@@ -26,4 +26,6 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
                                                             Collection<BookingStatus> statuses);
 
     Optional<Booking> findByQrToken(String qrToken);
+
+    List<Booking> findByBookedByEmailOrderByBookingDateDescStartTimeDesc(String bookedByEmail);
 }
