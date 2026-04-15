@@ -8,6 +8,7 @@ import BookingPage from './pages/bookings/BookingPage';
 import ResourceListPage from './pages/resources/ResourceListPage';
 import ResourceDetailsPage from './pages/resources/ResourceDetailsPage';
 import AddResourcePage from './pages/resources/AddResourcePage';
+import AddResourceAdmin from './pages/resources/AddResourceAdmin';
 import EditResourcePage from './pages/resources/EditResourcePage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminResources from './pages/admin/AdminResources';
@@ -52,6 +53,7 @@ function App() {
           <Route path="/admin/dashboard" element={<AdminLayoutWrapper><AdminDashboard /></AdminLayoutWrapper>} />
           <Route path="/admin/resources" element={<AdminLayoutWrapper><AdminResources /></AdminLayoutWrapper>} />
           <Route path="/admin/resources/:id" element={<AdminLayoutWrapper><AdminResourceDetails /></AdminLayoutWrapper>} />
+          <Route path="/admin/resources/add" element={<AdminLayoutWrapper><AddResourceAdmin /></AdminLayoutWrapper>} />
           
           {/* Test Routes */}
           <Route path="/test" element={<TestPage />} />

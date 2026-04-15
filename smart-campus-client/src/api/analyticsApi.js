@@ -34,6 +34,17 @@ const analyticsApi = {
       console.error('Error fetching recent resources:', error);
       throw error;
     }
+  },
+
+  // Import PDF analytics data
+  importPDFAnalytics: async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/analytics/pdf-import`);
+      return response.data;
+    } catch (error) {
+      console.error('Error importing PDF analytics:', error);
+      throw error;
+    }
   }
 };
 

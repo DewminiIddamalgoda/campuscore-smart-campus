@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import resourceApi from "../../api/resourceApi";
-import './Resources.css';
 
 const AddResourcePage = () => {
   console.log('AddResourcePage component rendered');
@@ -19,6 +18,65 @@ const AddResourcePage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
+
+  // Validation function
+  const validateForm = () => {
+    const errors = {};
+    
+    // Name validation
+    if (!formData.name.trim()) {
+      errors.name = 'Resource name is required';
+    } else if (formData.name.length < 3) {
+      errors.name = 'Resource name must be at least 3 characters long';
+    } else if (formData.name.length > 100) {
+      errors.name = 'Resource name must not exceed 100 characters';
+    }
+    
+    // Capacity validation
+    if (!formData.capacity) {
+      errors.capacity = 'Capacity is required';
+    } else if (isNaN(formData.capacity) || parseInt(formData.capacity) < 1) {
+      errors.capacity = 'Capacity must be a positive number';
+    } else if (parseInt(formData.capacity) > 1000) {
+      errors.capacity = 'Capacity must not exceed 1000';
+    }
+    
+    // Location validation
+    if (!formData.location.trim()) {
+      errors.location = 'Location is required';
+    } else if (formData.location.length < 3) {
+      errors.location = 'Location must be at least 3 characters long';
+    } else if (formData.location.length > 200) {
+      errors.location = 'Location must not exceed 200 characters';
+    }
+    
+    // Time validation
+    const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+    if (formData.availableFrom && !timeRegex.test(formData.availableFrom)) {
+      errors.availableFrom = 'Available From must be in HH:MM format (e.g., 09:00)';
+    }
+    if (formData.availableTo && !timeRegex.test(formData.availableTo)) {
+      errors.availableTo = 'Available To must be in HH:MM format (e.g., 17:00)';
+    }
+    if (formData.availableFrom && formData.availableTo) {
+      const from = formData.availableFrom.split(':');
+      const to = formData.availableTo.split(':');
+      const fromMinutes = parseInt(from[0]) * 60 + parseInt(from[1]);
+      const toMinutes = parseInt(to[0]) * 60 + parseInt(to[1]);
+      if (fromMinutes >= toMinutes) {
+        errors.availableTo = 'Available To must be later than Available From';
+      }
+    }
+    
+    // Description validation
+    if (formData.description && formData.description.length > 500) {
+      errors.description = 'Description must not exceed 500 characters';
+    }
+    
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,8 +88,15 @@ const AddResourcePage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
+    
+    // Validate form
+    if (!validateForm()) {
+      setError('Please fix the validation errors before submitting.');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const resourceData = {
@@ -40,7 +105,7 @@ const AddResourcePage = () => {
       };
       
       await resourceApi.createResource(resourceData);
-      navigate('/resources');
+      navigate('/admin/resources');
     } catch (err) {
       setError('Failed to create resource. Please check your input and try again.');
       console.error('Error creating resource:', err);
@@ -50,18 +115,17 @@ const AddResourcePage = () => {
   };
 
   return (
-    <div className="resources-page">
+    <div>
       {/* Header Section */}
-      <section className="resources-header">
+      <section>
         <Container>
-          <div className="resources-header-content">
+          <div>
             <div className="d-flex align-items-center gap-3 mb-3">
-              <Button className="secondary-btn" onClick={() => navigate('/resources')}>
-                <i className="fa fa-arrow-left me-2"></i>Back to Resources
+              <Button variant="secondary" onClick={() => navigate('/admin/resources')}>
+                Back
               </Button>
             </div>
             <h1>
-              <i className="fa fa-plus me-3"></i>
               Add New Resource
             </h1>
             <p>
@@ -72,23 +136,27 @@ const AddResourcePage = () => {
       </section>
 
       {/* Content Section */}
-      <section className="resources-content">
+      <section>
         <Container>
-          <div className="modern-card">
-            <div className="card-header-modern">
-              <h3 className="h4">
-                <i className="fa fa-plus-circle me-2"></i>
+          <div>
+            <div>
+              <h3>
                 Resource Information
               </h3>
-              <p className="text-muted mb-0">
+              <p>
                 Fill in the details below to add a new resource to the system
               </p>
             </div>
-            <div className="card-body-modern">
+            <div>
               {error && (
-                <div className="error-alert mb-4">
-                  <h4 className="mb-2">⚠️ Error</h4>
-                  <p className="mb-0">{error}</p>
+                <div className="alert alert-danger mb-4" role="alert">
+                  <div className="d-flex align-items-center">
+                    <i className="fa fa-exclamation-triangle me-2"></i>
+                    <div>
+                      <strong>Validation Error:</strong>
+                      <div className="mt-1">{error}</div>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -96,8 +164,7 @@ const AddResourcePage = () => {
                 <Row className="g-4">
                   <Col md={6}>
                     <Form.Group controlId="name">
-                      <Form.Label className="form-label-modern">
-                        <i className="fa fa-tag me-2"></i>
+                      <Form.Label>
                         Resource Name *
                       </Form.Label>
                       <Form.Control
@@ -105,38 +172,38 @@ const AddResourcePage = () => {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        required
                         placeholder="e.g., Lab A-401"
-                        className="modern-input"
+                        className={fieldErrors.name ? 'is-invalid' : ''}
                       />
+                      {fieldErrors.name && (
+                        <Form.Text className="text-danger">
+                          {fieldErrors.name}
+                        </Form.Text>
+                      )}
                     </Form.Group>
                   </Col>
 
                   <Col md={6}>
                     <Form.Group controlId="type">
-                      <Form.Label className="form-label-modern">
-                        <i className="fa fa-building me-2"></i>
+                      <Form.Label>
                         Resource Type *
                       </Form.Label>
                       <Form.Select
                         name="type"
                         value={formData.type}
                         onChange={handleChange}
-                        required
-                        className="modern-input"
                       >
-                        <option value="LECTURE_HALL">🎓 Lecture Hall</option>
-                        <option value="LAB">🔬 Laboratory</option>
-                        <option value="MEETING_ROOM">👥 Meeting Room</option>
-                        <option value="EQUIPMENT">📦 Equipment</option>
+                        <option value="LECTURE_HALL">Lecture Hall</option>
+                        <option value="LAB">Laboratory</option>
+                        <option value="MEETING_ROOM">Meeting Room</option>
+                        <option value="EQUIPMENT">Equipment</option>
                       </Form.Select>
                     </Form.Group>
                   </Col>
 
                   <Col md={6}>
                     <Form.Group controlId="capacity">
-                      <Form.Label className="form-label-modern">
-                        <i className="fa fa-users me-2"></i>
+                      <Form.Label>
                         Capacity *
                       </Form.Label>
                       <Form.Control
@@ -144,18 +211,21 @@ const AddResourcePage = () => {
                         name="capacity"
                         value={formData.capacity}
                         onChange={handleChange}
-                        required
                         placeholder="e.g., 50"
                         min="1"
-                        className="modern-input"
+                        className={fieldErrors.capacity ? 'is-invalid' : ''}
                       />
+                      {fieldErrors.capacity && (
+                        <Form.Text className="text-danger">
+                          {fieldErrors.capacity}
+                        </Form.Text>
+                      )}
                     </Form.Group>
                   </Col>
 
                   <Col md={6}>
                     <Form.Group controlId="location">
-                      <Form.Label className="form-label-modern">
-                        <i className="fa fa-map-marker me-2"></i>
+                      <Form.Label>
                         Location *
                       </Form.Label>
                       <Form.Control
@@ -163,35 +233,36 @@ const AddResourcePage = () => {
                         name="location"
                         value={formData.location}
                         onChange={handleChange}
-                        required
                         placeholder="e.g., Building A, Floor 4"
-                        className="modern-input"
+                        className={fieldErrors.location ? 'is-invalid' : ''}
                       />
+                      {fieldErrors.location && (
+                        <Form.Text className="text-danger">
+                          {fieldErrors.location}
+                        </Form.Text>
+                      )}
                     </Form.Group>
                   </Col>
 
                   <Col md={6}>
                     <Form.Group controlId="status">
-                      <Form.Label className="form-label-modern">
-                        <i className="fa fa-info-circle me-2"></i>
+                      <Form.Label>
                         Status
                       </Form.Label>
                       <Form.Select
                         name="status"
                         value={formData.status}
                         onChange={handleChange}
-                        className="modern-input"
                       >
-                        <option value="ACTIVE">✅ Active</option>
-                        <option value="OUT_OF_SERVICE">❌ Out of Service</option>
+                        <option value="ACTIVE"> Active</option>
+                        <option value="OUT_OF_SERVICE">❌Out of Service</option>
                       </Form.Select>
                     </Form.Group>
                   </Col>
 
                   <Col md={6}>
                     <Form.Group controlId="availableFrom">
-                      <Form.Label className="form-label-modern">
-                        <i className="fa fa-clock-o me-2"></i>
+                      <Form.Label>
                         Available From
                       </Form.Label>
                       <Form.Control
@@ -200,15 +271,19 @@ const AddResourcePage = () => {
                         value={formData.availableFrom}
                         onChange={handleChange}
                         placeholder="e.g., 09:00"
-                        className="modern-input"
+                        className={fieldErrors.availableFrom ? 'is-invalid' : ''}
                       />
+                      {fieldErrors.availableFrom && (
+                        <Form.Text className="text-danger">
+                          {fieldErrors.availableFrom}
+                        </Form.Text>
+                      )}
                     </Form.Group>
                   </Col>
 
                   <Col md={6}>
                     <Form.Group controlId="availableTo">
-                      <Form.Label className="form-label-modern">
-                        <i className="fa fa-clock-o me-2"></i>
+                      <Form.Label>
                         Available To
                       </Form.Label>
                       <Form.Control
@@ -217,15 +292,19 @@ const AddResourcePage = () => {
                         value={formData.availableTo}
                         onChange={handleChange}
                         placeholder="e.g., 17:00"
-                        className="modern-input"
+                        className={fieldErrors.availableTo ? 'is-invalid' : ''}
                       />
+                      {fieldErrors.availableTo && (
+                        <Form.Text className="text-danger">
+                          {fieldErrors.availableTo}
+                        </Form.Text>
+                      )}
                     </Form.Group>
                   </Col>
 
                   <Col md={12}>
                     <Form.Group controlId="description">
-                      <Form.Label className="form-label-modern">
-                        <i className="fa fa-file-text me-2"></i>
+                      <Form.Label>
                         Description
                       </Form.Label>
                       <Form.Control
@@ -233,18 +312,23 @@ const AddResourcePage = () => {
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
-                        placeholder="Enter a detailed description of the resource..."
+                        placeholder="Enter a detailed description of resource..."
                         rows={4}
-                        className="modern-input modern-textarea"
+                        className={fieldErrors.description ? 'is-invalid' : ''}
                       />
+                      {fieldErrors.description && (
+                        <Form.Text className="text-danger">
+                          {fieldErrors.description}
+                        </Form.Text>
+                      )}
                     </Form.Group>
                   </Col>
                 </Row>
 
-                <div className="form-actions mt-4">
+                <div className="mt-4">
                   <Button 
                     type="submit" 
-                    className="primary-btn"
+                    variant="primary"
                     disabled={loading}
                   >
                     {loading ? (
@@ -254,17 +338,15 @@ const AddResourcePage = () => {
                       </>
                     ) : (
                       <>
-                        <i className="fa fa-plus me-2"></i>
                         Create Resource
                       </>
                     )}
                   </Button>
                   <Button 
                     type="button" 
-                    className="secondary-btn"
-                    onClick={() => navigate('/resources')}
+                    variant="secondary"
+                    onClick={() => navigate('/admin/resources')}
                   >
-                    <i className="fa fa-times me-2"></i>
                     Cancel
                   </Button>
                 </div>
