@@ -8,9 +8,13 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/resources")
@@ -24,6 +28,18 @@ public class ResourceController {
     public ResponseEntity<ResourceResponseDto> createResource(@Valid @RequestBody ResourceRequestDto resourceDto) {
         ResourceResponseDto createdResource = resourceService.createResource(resourceDto);
         return new ResponseEntity<>(createdResource, HttpStatus.CREATED);
+    }
+
+    // Global exception handler for validation errors
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = error.getCodes() != null && error.getCodes().length > 0 ? error.getCodes()[0] : "global";
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return ResponseEntity.badRequest().body(errors);
     }
 
     @GetMapping

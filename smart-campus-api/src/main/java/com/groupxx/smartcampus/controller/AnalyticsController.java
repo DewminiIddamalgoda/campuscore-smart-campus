@@ -142,4 +142,90 @@ public class AnalyticsController {
             throw new RuntimeException("Failed to fetch recent resources", e);
         }
     }
+
+    @GetMapping("/pdf-import")
+    public ResponseEntity<Map<String, Object>> importPDFAnalytics() {
+        try {
+            List<com.groupxx.smartcampus.dto.ResourceResponseDto> allResources = resourceService.getAllResources();
+            Map<String, Object> pdfData = new HashMap<>();
+            
+            // Specific resource type counts
+            long labs = allResources.stream()
+                .filter(r -> "LAB".equals(r.getType().toString()))
+                .count();
+            long meetingRooms = allResources.stream()
+                .filter(r -> "MEETING_ROOM".equals(r.getType().toString()))
+                .count();
+            long equipment = allResources.stream()
+                .filter(r -> "EQUIPMENT".equals(r.getType().toString()))
+                .count();
+            long lectureHalls = allResources.stream()
+                .filter(r -> "LECTURE_HALL".equals(r.getType().toString()))
+                .count();
+            
+            // Real-time analytics data
+            Map<String, Object> realTimeStats = new HashMap<>();
+            realTimeStats.put("labs", labs);
+            realTimeStats.put("meetingRooms", meetingRooms);
+            realTimeStats.put("equipment", equipment);
+            realTimeStats.put("lectureHalls", lectureHalls);
+            realTimeStats.put("totalResources", allResources.size());
+            realTimeStats.put("activeResources", allResources.stream()
+                .filter(r -> "ACTIVE".equals(r.getStatus().toString()))
+                .count());
+            realTimeStats.put("outOfServiceResources", allResources.stream()
+                .filter(r -> "OUT_OF_SERVICE".equals(r.getStatus().toString()))
+                .count());
+            
+            // Capacity analytics
+            double avgCapacity = allResources.stream()
+                .mapToInt(r -> r.getCapacity() != null ? r.getCapacity() : 0)
+                .average()
+                .orElse(0.0);
+            int totalCapacity = allResources.stream()
+                .mapToInt(r -> r.getCapacity() != null ? r.getCapacity() : 0)
+                .sum();
+            
+            realTimeStats.put("averageCapacity", Math.round(avgCapacity));
+            realTimeStats.put("totalCapacity", totalCapacity);
+            
+            // Status distribution
+            Map<String, Long> statusDistribution = new HashMap<>();
+            allResources.forEach(resource -> {
+                String status = resource.getStatus().toString();
+                statusDistribution.put(status, statusDistribution.getOrDefault(status, 0L) + 1);
+            });
+            realTimeStats.put("statusDistribution", statusDistribution);
+            
+            // Type distribution
+            Map<String, Long> typeDistribution = new HashMap<>();
+            allResources.forEach(resource -> {
+                String type = resource.getType().toString();
+                typeDistribution.put(type, typeDistribution.getOrDefault(type, 0L) + 1);
+            });
+            realTimeStats.put("typeDistribution", typeDistribution);
+            
+            // Recent resources for PDF
+            List<com.groupxx.smartcampus.dto.ResourceResponseDto> recentResources = allResources.stream()
+                .skip(Math.max(0, allResources.size() - 10))
+                .collect(java.util.stream.Collectors.toList());
+            realTimeStats.put("recentResources", recentResources);
+            
+            // Timestamp for PDF
+            realTimeStats.put("generatedAt", java.time.LocalDateTime.now().toString());
+            realTimeStats.put("generatedDate", java.time.LocalDate.now().toString());
+            realTimeStats.put("generatedTime", java.time.LocalTime.now().toString());
+            
+            pdfData.put("analytics", realTimeStats);
+            pdfData.put("success", true);
+            pdfData.put("message", "PDF analytics data imported successfully");
+            
+            return ResponseEntity.ok(pdfData);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "Failed to import PDF analytics: " + e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
 }

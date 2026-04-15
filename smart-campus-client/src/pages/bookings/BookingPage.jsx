@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Badge, Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
+import { useLocation } from 'react-router-dom';
 import bookingApi from '../../api/bookingApi';
 import resourceApi from '../../api/resourceApi';
 import './BookingPage.css';
@@ -24,6 +25,7 @@ const EMPTY_FORM = {
 };
 
 const BookingPage = () => {
+  const location = useLocation();
   const [resources, setResources] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [filters, setFilters] = useState({
@@ -37,6 +39,16 @@ const BookingPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
   const [validationErrors, setValidationErrors] = useState({});
+
+  const routeSelectedResourceId = useMemo(() => {
+    const fromState = location.state?.selectedResourceId;
+    if (fromState) {
+      return fromState;
+    }
+
+    const searchParams = new URLSearchParams(location.search || '');
+    return searchParams.get('resourceId') || '';
+  }, [location.search, location.state]);
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
@@ -74,6 +86,19 @@ const BookingPage = () => {
 
         setResources(resourceData);
         setBookings(bookingData);
+
+        if (routeSelectedResourceId) {
+          const canPreselectResource = resourceData.some(
+            (resource) => resource.id === routeSelectedResourceId && resource.status === 'ACTIVE'
+          );
+
+          if (canPreselectResource) {
+            setFormData((current) => ({
+              ...current,
+              resourceId: routeSelectedResourceId
+            }));
+          }
+        }
       } catch (error) {
         setFeedback({
           type: 'danger',
@@ -85,7 +110,7 @@ const BookingPage = () => {
     };
 
     initializePage();
-  }, []);
+  }, [routeSelectedResourceId]);
 
   const refreshBookings = async (nextFilters = filters) => {
     const bookingData = await bookingApi.getBookings(nextFilters);
