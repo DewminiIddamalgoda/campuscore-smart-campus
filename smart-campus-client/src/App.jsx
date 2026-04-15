@@ -12,6 +12,8 @@ import AddResourceAdmin from './pages/resources/AddResourceAdmin';
 import EditResourcePage from './pages/resources/EditResourcePage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminResources from './pages/admin/AdminResources';
+import AdminQrCheckInPage from './pages/admin/AdminQrCheckInPage';
+import AdminBookingRequests from './pages/admin/AdminBookingRequests';
 import AdminResourceDetails from './pages/resources/adminResourceDetails';
 import TestPage from './pages/TestPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -52,6 +54,8 @@ function App() {
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={<AdminLayoutWrapper><AdminDashboard /></AdminLayoutWrapper>} />
           <Route path="/admin/resources" element={<AdminLayoutWrapper><AdminResources /></AdminLayoutWrapper>} />
+          <Route path="/admin/check-in" element={<AdminLayoutWrapper><AdminQrCheckInPage /></AdminLayoutWrapper>} />
+          <Route path="/admin/bookings" element={<AdminLayoutWrapper><AdminBookingRequests /></AdminLayoutWrapper>} />
           <Route path="/admin/resources/:id" element={<AdminLayoutWrapper><AdminResourceDetails /></AdminLayoutWrapper>} />
           <Route path="/admin/resources/add" element={<AdminLayoutWrapper><AddResourceAdmin /></AdminLayoutWrapper>} />
           
