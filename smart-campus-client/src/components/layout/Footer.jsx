@@ -88,40 +88,38 @@ const Footer = () => {
           </Col>
 
           <Col lg={4} md={6} sm={12}>
-            <div className="footer-block footer-newsletter advanced-newsletter">
-              <h4>Stay Updated</h4>
-              <p className="newsletter-text">
-                Get updates about new platform improvements, system enhancements, and
-                smart campus features.
-              </p>
+          <div className="footer-block footer-support-block enhanced-support">
+            <h4>Support & Help Desk</h4>
 
-              <form className="footer-newsletter-form">
-                <div className="newsletter-input-wrap">
-                  <i className="fa fa-envelope-o newsletter-icon" />
-                  <input
-                    type="email"
-                    className="modern-input footer-input"
-                    placeholder="Enter your email address"
-                    required
-                  />
-                </div>
+            <div className="support-status">
+              <span className="status-dot"></span>
+              <span>Support Available</span>
+            </div>
 
-                <Button className="modern-btn w-100 footer-subscribe-btn" variant="primary">
-                  Subscribe Now
-                </Button>
-              </form>
+            <p className="support-text">
+              Facing issues with campus resources? Report incidents, track progress, 
+              and get quick resolutions through our smart support system.
+            </p>
 
-              <div className="footer-contact-mini">
-                <div className="mini-contact-item">
-                  <i className="fa fa-phone" />
-                  <span>+94 11 754 4801</span>
-                </div>
-                <div className="mini-contact-item">
-                  <i className="fa fa-envelope" />
-                  <a href="mailto:campuscore@group.com">campuscore@group.com</a>
-                </div>
+            <div className="support-actions">
+              <Link to="/tickets" className="footer-cta-btn primary w-100 mb-2">
+                Report an Issue
+              </Link>
+
+              
+            </div>
+
+            <div className="footer-contact-mini mt-3">
+              <div className="mini-contact-item">
+                <i className="fa fa-phone" />
+                <span>+94 11 754 4801</span>
+              </div>
+              <div className="mini-contact-item">
+                <i className="fa fa-envelope" />
+                <a href="mailto:campuscore@group.com">campuscore@group.com</a>
               </div>
             </div>
+          </div>
           </Col>
         </Row>
 
