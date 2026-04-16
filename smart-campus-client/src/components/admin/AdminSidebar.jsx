@@ -1,11 +1,13 @@
 import React from 'react';
 import { Nav } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  FaTachometerAlt, 
-  FaBoxOpen, 
-  FaChartBar, 
-  FaUsers, 
+import {
+  FaTachometerAlt,
+  FaBoxOpen,
+  FaChartBar,
+  FaQrcode,
+  FaCalendarCheck,
+  FaUsers,
   FaTools,
   FaBell,
   FaCog
@@ -30,6 +32,24 @@ const AdminSidebar = () => {
       label: 'Resources'
     },
     {
+      path: '/admin/bookings',
+      icon: <FaCalendarCheck />,
+      label: 'Booking Requests'
+    },
+  
+    
+    {
+      path: '/admin/tickets',
+      icon: <FaTools />,
+      label: 'Tickets'
+    },
+  
+    {
+      path: '/admin/check-in',
+      icon: <FaQrcode />,
+      label: 'QR Check-in'
+    },
+    {
       path: '/admin/analytics',
       icon: <FaChartBar />,
       label: 'Analytics'
@@ -38,11 +58,6 @@ const AdminSidebar = () => {
       path: '/admin/users',
       icon: <FaUsers />,
       label: 'Users'
-    },
-    {
-      path: '/admin/maintenance',
-      icon: <FaTools />,
-      label: 'Maintenance'
     },
     {
       path: '/admin/notifications',

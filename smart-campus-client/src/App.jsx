@@ -12,8 +12,13 @@ import AddResourceAdmin from './pages/resources/AddResourceAdmin';
 import EditResourcePage from './pages/resources/EditResourcePage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminResources from './pages/admin/AdminResources';
+import AdminQrCheckInPage from './pages/admin/AdminQrCheckInPage';
+import AdminBookingRequests from './pages/admin/AdminBookingRequests';
 import AdminResourceDetails from './pages/resources/adminResourceDetails';
 import TestPage from './pages/TestPage';
+import TicketsPage from './pages/SupportTicket/TicketsPage';
+import AdminTicketsPage from './pages/admin/AdminTicketsPage';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // User Layout Component
@@ -48,12 +53,17 @@ function App() {
           <Route path="/resources/:id" element={<UserLayout><ResourceDetailsPage /></UserLayout>} />
           <Route path="/resources/add" element={<UserLayout><AddResourcePage /></UserLayout>} />
           <Route path="/resources/edit/:id" element={<UserLayout><EditResourcePage /></UserLayout>} />
+          <Route path="/tickets" element={<UserLayout><TicketsPage /></UserLayout>} />
           
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={<AdminLayoutWrapper><AdminDashboard /></AdminLayoutWrapper>} />
           <Route path="/admin/resources" element={<AdminLayoutWrapper><AdminResources /></AdminLayoutWrapper>} />
+          <Route path="/admin/check-in" element={<AdminLayoutWrapper><AdminQrCheckInPage /></AdminLayoutWrapper>} />
+          <Route path="/admin/bookings" element={<AdminLayoutWrapper><AdminBookingRequests /></AdminLayoutWrapper>} />
           <Route path="/admin/resources/:id" element={<AdminLayoutWrapper><AdminResourceDetails /></AdminLayoutWrapper>} />
           <Route path="/admin/resources/add" element={<AdminLayoutWrapper><AddResourceAdmin /></AdminLayoutWrapper>} />
+          <Route path="/admin/tickets" element={<AdminLayoutWrapper><AdminTicketsPage /></AdminLayoutWrapper>} />
+          
           
           {/* Test Routes */}
           <Route path="/test" element={<TestPage />} />

@@ -29,6 +29,11 @@ public class BookingResponseDto {
 
     private BookingStatus status;
     private String notes;
+    private String rejectionReason;
+    private String qrToken;
+    private LocalDateTime qrIssuedAt;
+    private LocalDateTime qrExpiresAt;
+    private LocalDateTime checkedInAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -70,6 +75,21 @@ public class BookingResponseDto {
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
+
+    public String getRejectionReason() { return rejectionReason; }
+    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
+
+    public String getQrToken() { return qrToken; }
+    public void setQrToken(String qrToken) { this.qrToken = qrToken; }
+
+    public LocalDateTime getQrIssuedAt() { return qrIssuedAt; }
+    public void setQrIssuedAt(LocalDateTime qrIssuedAt) { this.qrIssuedAt = qrIssuedAt; }
+
+    public LocalDateTime getQrExpiresAt() { return qrExpiresAt; }
+    public void setQrExpiresAt(LocalDateTime qrExpiresAt) { this.qrExpiresAt = qrExpiresAt; }
+
+    public LocalDateTime getCheckedInAt() { return checkedInAt; }
+    public void setCheckedInAt(LocalDateTime checkedInAt) { this.checkedInAt = checkedInAt; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
