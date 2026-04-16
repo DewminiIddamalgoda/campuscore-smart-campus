@@ -8,6 +8,7 @@ import com.groupxx.smartcampus.enums.ResourceType;
 import com.groupxx.smartcampus.service.ResourceService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,9 +27,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ResourceController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@ImportAutoConfiguration(exclude = {
-        org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration.class,
-        org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration.class
+@EnableAutoConfiguration(exclude = {
+        org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration.class
 })
 public class ResourceControllerTest {
 
