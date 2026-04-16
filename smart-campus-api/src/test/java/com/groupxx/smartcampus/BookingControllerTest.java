@@ -32,12 +32,11 @@ import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(BookingController.class)
-@AutoConfigureMockMvc(addFilters = false)
-@EnableAutoConfiguration(exclude = {
+@WebMvcTest(controllers = BookingController.class, excludeAutoConfiguration = {
                 org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration.class,
                 org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration.class
 })
+@AutoConfigureMockMvc(addFilters = false)
 public class BookingControllerTest {
 
         @Autowired
