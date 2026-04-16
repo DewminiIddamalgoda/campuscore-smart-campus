@@ -5,8 +5,12 @@ import com.groupxx.smartcampus.enums.TicketStatus;
 import com.groupxx.smartcampus.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -52,9 +56,53 @@ public class TicketService {
 
     // Delete Ticket
     public void deleteTicket(String id) {
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+        Ticket ticket = getTicketById(id);
+        ticketRepository.delete(ticket);
+    }
 
-        ticketRepository.deleteById(id);
+    // Image Upload
+    public Ticket uploadImages(String id, List<MultipartFile> files) {
+
+        Ticket ticket = getTicketById(id);
+
+        List<String> imageUrls = ticket.getImageUrls();
+        if (imageUrls == null) {
+            imageUrls = new ArrayList<>();
+        }
+
+        if (imageUrls.size() + files.size() > 3) {
+            throw new RuntimeException("Maximum 3 images allowed");
+        }
+
+        String uploadDir = System.getProperty("user.dir") + "/uploads/";
+        File directory = new File(uploadDir);
+
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        for (MultipartFile file : files) {
+            try {
+                if (file.isEmpty()) {
+                    continue;
+                }
+
+                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                File destination = new File(uploadDir + fileName);
+
+                file.transferTo(destination);
+
+                // Save relative path (clean)
+                imageUrls.add("uploads/" + fileName);
+
+            } catch (IOException e) {
+                throw new RuntimeException("File upload failed: " + e.getMessage());
+            }
+        }
+
+        ticket.setImageUrls(imageUrls);
+        ticket.setUpdatedAt(LocalDateTime.now());
+
+        return ticketRepository.save(ticket);
     }
 }

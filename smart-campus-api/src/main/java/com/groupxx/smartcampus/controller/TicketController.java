@@ -6,6 +6,7 @@ import com.groupxx.smartcampus.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -58,5 +59,13 @@ public class TicketController {
     public ResponseEntity<String> deleteTicket(@PathVariable String id) {
         ticketService.deleteTicket(id);
         return ResponseEntity.ok("Ticket deleted successfully");
+    }
+
+    @PostMapping("/{id}/upload")
+    public ResponseEntity<Ticket> uploadImages(
+            @PathVariable String id,
+            @RequestParam("files") List<MultipartFile> files) {
+
+        return ResponseEntity.ok(ticketService.uploadImages(id, files));
     }
 }

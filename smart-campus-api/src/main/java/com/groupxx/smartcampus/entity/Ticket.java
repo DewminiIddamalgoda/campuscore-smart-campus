@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Document(collection = "tickets")
 public class Ticket {
@@ -23,6 +24,8 @@ public class Ticket {
     private String resourceId;
     private String userId;
     private String assignedTo;
+
+    private List<String> imageUrls;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -103,6 +106,14 @@ public class Ticket {
 
     public void setAssignedTo(String assignedTo) {
         this.assignedTo = assignedTo;
+    }
+
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public LocalDateTime getCreatedAt() {
