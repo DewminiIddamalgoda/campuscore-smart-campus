@@ -32,14 +32,22 @@ const AdminSidebar = () => {
       label: 'Resources'
     },
     {
-      path: '/admin/check-in',
-      icon: <FaQrcode />,
-      label: 'QR Check-in'
-    },
-    {
       path: '/admin/bookings',
       icon: <FaCalendarCheck />,
       label: 'Booking Requests'
+    },
+  
+    
+    {
+      path: '/admin/tickets',
+      icon: <FaTools />,
+      label: 'Tickets'
+    },
+  
+    {
+      path: '/admin/check-in',
+      icon: <FaQrcode />,
+      label: 'QR Check-in'
     },
     {
       path: '/admin/analytics',
@@ -50,11 +58,6 @@ const AdminSidebar = () => {
       path: '/admin/users',
       icon: <FaUsers />,
       label: 'Users'
-    },
-    {
-      path: '/admin/maintenance',
-      icon: <FaTools />,
-      label: 'Maintenance'
     },
     {
       path: '/admin/notifications',

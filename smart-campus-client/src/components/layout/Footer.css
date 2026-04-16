@@ -5,7 +5,6 @@
   color: #ffffff;
   padding: 80px 0 20px;
   overflow: hidden;
-  margin-top: 60px;
 }
 
 /* Footer Glow Effects */
@@ -465,4 +464,48 @@
 .modern-btn.footer-subscribe-btn:focus {
   outline: 2px solid #4a90e2;
   outline-offset: 2px;
+}
+
+
+
+.enhanced-support {
+  background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 20px;
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+  transition: 0.3s ease;
+}
+
+.enhanced-support:hover {
+  transform: translateY(-3px);
+  border-color: rgba(120, 140, 255, 0.4);
+}
+
+.support-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 10px;
+  color: #9be7c4;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: #4caf50;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #4caf50;
+}
+
+.support-text {
+  font-size: 14px;
+  color: #cfcfcf;
+  margin-bottom: 15px;
+}
+
+.support-actions .footer-cta-btn {
+  display: block;
+  text-align: center;
 }
