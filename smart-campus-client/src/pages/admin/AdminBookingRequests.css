@@ -1,0 +1,112 @@
+.admin-booking-requests {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding-bottom: 2rem;
+}
+
+.admin-booking-requests h2 {
+  color: white;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.admin-booking-requests .text-muted {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.admin-booking-requests .card {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.admin-booking-requests .card-body {
+  padding: 1.5rem;
+}
+
+.admin-booking-requests .table-responsive {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.admin-booking-requests table {
+  font-size: 0.95rem;
+}
+
+.admin-booking-requests table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f8fafc !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.admin-booking-requests table tbody tr {
+  border-top: 1px solid #e2e8f0;
+  transition: background-color 0.15s ease;
+}
+
+.admin-booking-requests table tbody tr:hover {
+  background-color: rgba(102, 126, 234, 0.05);
+}
+
+.admin-booking-requests .badge {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.75rem;
+  font-weight: 600;
+}
+
+.admin-booking-requests .btn-outline-primary {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.admin-booking-requests .btn-outline-primary:hover {
+  background-color: #667eea;
+  border-color: #667eea;
+  color: white;
+}
+
+.admin-booking-requests .form-select,
+.admin-booking-requests .form-control {
+  border-radius: 0.625rem;
+  border: 1px solid #e2e8f0;
+  font-size: 0.95rem;
+}
+
+.admin-booking-requests .form-select:focus,
+.admin-booking-requests .form-control:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+}
+
+.admin-booking-requests .fw-500 {
+  font-weight: 500;
+}
+
+.admin-booking-requests .small {
+  font-size: 0.875rem;
+}
+
+.admin-booking-requests .card-footer {
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+@media (max-width: 768px) {
+  .admin-booking-requests .table-responsive {
+    max-height: 400px;
+  }
+
+  .admin-booking-requests table {
+    font-size: 0.9rem;
+  }
+
+  .admin-booking-requests .btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.85rem;
+  }
+}

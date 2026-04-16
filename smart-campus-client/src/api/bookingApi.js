@@ -34,8 +34,31 @@ const bookingApi = {
     return response.data;
   },
 
+  issueBookingQr: async (id) => {
+    const response = await axios.post(`${API_BASE_URL}/bookings/${id}/qr`);
+    return response.data;
+  },
+
+  checkInBookingQr: async (token) => {
+    const response = await axios.post(`${API_BASE_URL}/bookings/check-in`, { token });
+    return response.data;
+  },
+
   deleteBooking: async (id) => {
     await axios.delete(`${API_BASE_URL}/bookings/${id}`);
+  },
+
+  reviewBooking: async (id, status, rejectionReason = '') => {
+    const response = await axios.patch(`${API_BASE_URL}/bookings/${id}/review`, {
+      status,
+      rejectionReason
+    });
+    return response.data;
+  },
+
+  getUserBookings: async (email) => {
+    const response = await axios.get(`${API_BASE_URL}/bookings/user/${encodeURIComponent(email)}`);
+    return response.data;
   }
 };
 

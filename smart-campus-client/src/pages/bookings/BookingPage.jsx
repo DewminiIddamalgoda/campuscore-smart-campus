@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, Badge, Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
+import { Alert, Badge, Button, Card, Col, Container, Form, Modal, Row, Spinner } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 import bookingApi from '../../api/bookingApi';
 import resourceApi from '../../api/resourceApi';
@@ -39,6 +39,8 @@ const BookingPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
   const [validationErrors, setValidationErrors] = useState({});
+  const [activeQrBooking, setActiveQrBooking] = useState(null);
+  const [qrBusyId, setQrBusyId] = useState('');
 
   const routeSelectedResourceId = useMemo(() => {
     const fromState = location.state?.selectedResourceId;
@@ -61,6 +63,15 @@ const BookingPage = () => {
     () => activeResources.find((resource) => resource.id === formData.resourceId) || null,
     [activeResources, formData.resourceId]
   );
+
+  const qrPreviewUrl = useMemo(() => {
+    if (!activeQrBooking?.qrToken) {
+      return '';
+    }
+
+    const data = encodeURIComponent(activeQrBooking.qrToken);
+    return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${data}`;
+  }, [activeQrBooking]);
 
   const relevantBookings = useMemo(() => {
     if (!formData.resourceId || !formData.bookingDate) return [];
@@ -111,6 +122,36 @@ const BookingPage = () => {
 
     initializePage();
   }, [routeSelectedResourceId]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const syncBookings = async () => {
+      try {
+        const bookingData = await bookingApi.getBookings(filters);
+
+        if (isActive) {
+          setBookings(bookingData);
+        }
+      } catch (error) {
+        console.error('Unable to refresh bookings list.', error);
+      }
+    };
+
+    const intervalId = window.setInterval(syncBookings, 30000);
+
+    const handleFocus = () => {
+      syncBookings();
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      isActive = false;
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [filters]);
 
   const refreshBookings = async (nextFilters = filters) => {
     const bookingData = await bookingApi.getBookings(nextFilters);
@@ -305,6 +346,29 @@ const BookingPage = () => {
       });
     }
   };
+
+  const handleIssueQr = async (bookingId) => {
+    try {
+      setQrBusyId(bookingId);
+      const updatedBooking = await bookingApi.issueBookingQr(bookingId);
+      setActiveQrBooking(updatedBooking);
+      await refreshBookings();
+      setFeedback({
+        type: 'success',
+        message: 'QR token issued for this booking.'
+      });
+    } catch (error) {
+      setFeedback({
+        type: 'danger',
+        message:
+          error?.response?.data?.message ||
+          'Unable to issue QR token right now.'
+      });
+    } finally {
+      setQrBusyId('');
+    }
+  };
+
 
   if (loading && bookings.length === 0 && resources.length === 0) {
     return (
@@ -573,6 +637,7 @@ const BookingPage = () => {
                   )}
                 </Card.Body>
               </Card>
+
             </Col>
 
             <Col lg={7}>
@@ -656,6 +721,11 @@ const BookingPage = () => {
                             </p>
                             <p className="booking-list-purpose">{booking.purpose}</p>
                             {booking.notes && <p className="booking-list-notes">Notes: {booking.notes}</p>}
+                            {booking.checkedInAt && (
+                              <p className="booking-list-notes">
+                                Checked in: {new Date(booking.checkedInAt).toLocaleString()}
+                              </p>
+                            )}
                           </div>
 
                           <div className="booking-list-actions">
@@ -697,6 +767,27 @@ const BookingPage = () => {
                               </>
                             )}
 
+                            {booking.status === 'APPROVED' && !booking.checkedInAt && (
+                              <Button
+                                size="sm"
+                                variant="outline-success"
+                                onClick={() => handleIssueQr(booking.id)}
+                                disabled={qrBusyId === booking.id}
+                              >
+                                {qrBusyId === booking.id ? 'Issuing...' : 'Issue QR'}
+                              </Button>
+                            )}
+
+                            {booking.status === 'APPROVED' && booking.qrToken && !booking.checkedInAt && (
+                              <Button
+                                size="sm"
+                                variant="outline-dark"
+                                onClick={() => setActiveQrBooking(booking)}
+                              >
+                                View QR
+                              </Button>
+                            )}
+
                             {(booking.status === 'REJECTED' || booking.status === 'CANCELLED') && (
                               <Button
                                 size="sm"
@@ -717,6 +808,35 @@ const BookingPage = () => {
           </Row>
         </Container>
       </section>
+
+      <Modal show={Boolean(activeQrBooking)} onHide={() => setActiveQrBooking(null)} centered className="booking-qr-modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Booking QR Pass</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {activeQrBooking?.qrToken ? (
+            <div className="qr-details">
+              <p className="qr-booking-info">
+                {activeQrBooking.resourceName || 'Resource'} | {activeQrBooking.bookingDate} | {activeQrBooking.startTime} - {activeQrBooking.endTime}
+              </p>
+              <div className="qr-code-container">
+                <img src={qrPreviewUrl} alt="Booking QR code" />
+              </div>
+              <div className="qr-token-info">
+                <div className="qr-token-label">Token</div>
+                <div className="qr-token-value">{activeQrBooking.qrToken}</div>
+                {activeQrBooking.qrExpiresAt && (
+                  <div className="qr-expiry">
+                    Expires at: {new Date(activeQrBooking.qrExpiresAt).toLocaleString()}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <p className="mb-0">No QR token has been issued for this booking yet.</p>
+          )}
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

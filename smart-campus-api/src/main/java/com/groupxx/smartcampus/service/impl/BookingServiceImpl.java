@@ -17,9 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.LocalTime;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +30,8 @@ public class BookingServiceImpl implements BookingService {
 
     private static final EnumSet<BookingStatus> CONFLICT_BLOCKING_STATUSES =
             EnumSet.of(BookingStatus.PENDING, BookingStatus.APPROVED);
+    private static final int CHECK_IN_WINDOW_BEFORE_MINUTES = 15;
+    private static final int CHECK_IN_WINDOW_AFTER_MINUTES = 30;
 
     @Autowired
     private BookingRepository bookingRepository;
@@ -87,6 +92,7 @@ public class BookingServiceImpl implements BookingService {
         validateBookingRequest(bookingDto, resource, id);
 
         mapRequestToEntity(bookingDto, existingBooking);
+        clearQrData(existingBooking);
         return convertToResponseDto(bookingRepository.save(existingBooking), resource);
     }
 
@@ -101,6 +107,73 @@ public class BookingServiceImpl implements BookingService {
         }
 
         booking.setStatus(status);
+
+        booking.setRejectionReason(null);
+
+        if (status != BookingStatus.APPROVED) {
+            clearQrData(booking);
+        }
+
+        return convertToResponseDto(bookingRepository.save(booking));
+    }
+
+    @Override
+    public BookingResponseDto issueQrForBooking(String id) {
+        Booking booking = getBookingEntityById(id);
+
+        if (booking.getStatus() != BookingStatus.APPROVED) {
+            throw new BookingValidationException("QR codes can only be issued for approved bookings");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime bookingEnd = LocalDateTime.of(booking.getBookingDate(), booking.getEndTime());
+        LocalDateTime qrExpiry = bookingEnd.plusMinutes(CHECK_IN_WINDOW_AFTER_MINUTES);
+
+        if (now.isAfter(qrExpiry)) {
+            throw new BookingValidationException("Cannot issue QR for a booking that has already ended");
+        }
+
+        booking.setQrToken(UUID.randomUUID().toString());
+        booking.setQrIssuedAt(now);
+        booking.setQrExpiresAt(qrExpiry);
+        booking.setCheckedInAt(null);
+
+        return convertToResponseDto(bookingRepository.save(booking));
+    }
+
+    @Override
+    public BookingResponseDto checkInWithQrToken(String token) {
+        Booking booking = bookingRepository.findByQrToken(token)
+                .orElseThrow(() -> new BookingValidationException("Invalid QR token"));
+
+        if (booking.getStatus() != BookingStatus.APPROVED) {
+            throw new BookingValidationException("Only approved bookings can be checked in");
+        }
+
+        if (booking.getCheckedInAt() != null) {
+            throw new BookingValidationException("This booking has already been checked in");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime bookingStart = LocalDateTime.of(booking.getBookingDate(), booking.getStartTime());
+        LocalDateTime bookingEnd = LocalDateTime.of(booking.getBookingDate(), booking.getEndTime());
+        LocalDateTime windowStart = bookingStart.minusMinutes(CHECK_IN_WINDOW_BEFORE_MINUTES);
+        LocalDateTime windowEnd = bookingEnd.plusMinutes(CHECK_IN_WINDOW_AFTER_MINUTES);
+
+        if (now.isBefore(windowStart) || now.isAfter(windowEnd)) {
+            String errorMsg = String.format(
+                "Check-in window closed. Valid window: %s to %s (from 15 min before start until 30 min after end)",
+                windowStart.format(DateTimeFormatter.ofPattern("HH:mm")),
+                windowEnd.format(DateTimeFormatter.ofPattern("HH:mm"))
+            );
+            throw new BookingValidationException(errorMsg);
+        }
+
+        if (booking.getQrExpiresAt() != null && now.isAfter(booking.getQrExpiresAt())) {
+            throw new BookingValidationException("QR token has expired");
+        }
+
+        booking.setCheckedInAt(now);
         return convertToResponseDto(bookingRepository.save(booking));
     }
 
@@ -108,6 +181,38 @@ public class BookingServiceImpl implements BookingService {
     public void deleteBooking(String id) {
         Booking booking = getBookingEntityById(id);
         bookingRepository.delete(booking);
+    }
+
+    @Override
+    public BookingResponseDto reviewBooking(String id, BookingStatus status, String rejectionReason) {
+        Booking booking = getBookingEntityById(id);
+        validateStatusTransition(booking, status);
+
+        if (status == BookingStatus.APPROVED) {
+            Resource resource = getActiveResource(booking.getResourceId());
+            validateConflict(booking.getId(), resource, booking.getBookingDate(), booking.getStartTime(), booking.getEndTime());
+        }
+
+        booking.setStatus(status);
+
+        if (status == BookingStatus.REJECTED) {
+            booking.setRejectionReason(rejectionReason);
+            clearQrData(booking);
+        } else if (status == BookingStatus.APPROVED) {
+            booking.setRejectionReason(null);
+        } else if (status != BookingStatus.APPROVED) {
+            clearQrData(booking);
+        }
+
+        return convertToResponseDto(bookingRepository.save(booking));
+    }
+
+    @Override
+    public List<BookingResponseDto> getUserBookings(String email) {
+        List<Booking> bookings = bookingRepository.findByBookedByEmailOrderByBookingDateDescStartTimeDesc(email);
+        return bookings.stream()
+                .map(this::convertToResponseDto)
+                .collect(Collectors.toList());
     }
 
     private Booking getBookingEntityById(String id) {
@@ -193,12 +298,12 @@ public class BookingServiceImpl implements BookingService {
             return;
         }
 
-        if (currentStatus == BookingStatus.CANCELLED || currentStatus == BookingStatus.REJECTED) {
-            throw new BookingValidationException("Cancelled or rejected bookings cannot change status");
+        if (currentStatus == BookingStatus.CANCELLED) {
+            throw new BookingValidationException("Cancelled bookings cannot change status");
         }
 
-        if (currentStatus == BookingStatus.APPROVED && newStatus == BookingStatus.REJECTED) {
-            throw new BookingValidationException("Approved bookings cannot be rejected");
+        if (currentStatus == BookingStatus.REJECTED && newStatus != BookingStatus.APPROVED) {
+            throw new BookingValidationException("Rejected bookings can only be changed back to approved");
         }
     }
 
@@ -212,6 +317,13 @@ public class BookingServiceImpl implements BookingService {
         booking.setStartTime(bookingDto.getStartTime());
         booking.setEndTime(bookingDto.getEndTime());
         booking.setNotes(bookingDto.getNotes());
+    }
+
+    private void clearQrData(Booking booking) {
+        booking.setQrToken(null);
+        booking.setQrIssuedAt(null);
+        booking.setQrExpiresAt(null);
+        booking.setCheckedInAt(null);
     }
 
     private BookingResponseDto convertToResponseDto(Booking booking) {
@@ -232,6 +344,10 @@ public class BookingServiceImpl implements BookingService {
         dto.setEndTime(booking.getEndTime());
         dto.setStatus(booking.getStatus());
         dto.setNotes(booking.getNotes());
+        dto.setQrToken(booking.getQrToken());
+        dto.setQrIssuedAt(booking.getQrIssuedAt());
+        dto.setQrExpiresAt(booking.getQrExpiresAt());
+        dto.setCheckedInAt(booking.getCheckedInAt());
         dto.setCreatedAt(booking.getCreatedAt());
         dto.setUpdatedAt(booking.getUpdatedAt());
 
