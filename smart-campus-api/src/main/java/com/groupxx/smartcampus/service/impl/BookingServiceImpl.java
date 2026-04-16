@@ -108,6 +108,8 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setStatus(status);
 
+        booking.setRejectionReason(null);
+
         if (status != BookingStatus.APPROVED) {
             clearQrData(booking);
         }
@@ -296,12 +298,12 @@ public class BookingServiceImpl implements BookingService {
             return;
         }
 
-        if (currentStatus == BookingStatus.CANCELLED || currentStatus == BookingStatus.REJECTED) {
-            throw new BookingValidationException("Cancelled or rejected bookings cannot change status");
+        if (currentStatus == BookingStatus.CANCELLED) {
+            throw new BookingValidationException("Cancelled bookings cannot change status");
         }
 
-        if (currentStatus == BookingStatus.APPROVED && newStatus == BookingStatus.REJECTED) {
-            throw new BookingValidationException("Approved bookings cannot be rejected");
+        if (currentStatus == BookingStatus.REJECTED && newStatus != BookingStatus.APPROVED) {
+            throw new BookingValidationException("Rejected bookings can only be changed back to approved");
         }
     }
 

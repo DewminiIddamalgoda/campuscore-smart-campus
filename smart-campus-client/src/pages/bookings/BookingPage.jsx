@@ -123,6 +123,36 @@ const BookingPage = () => {
     initializePage();
   }, [routeSelectedResourceId]);
 
+  useEffect(() => {
+    let isActive = true;
+
+    const syncBookings = async () => {
+      try {
+        const bookingData = await bookingApi.getBookings(filters);
+
+        if (isActive) {
+          setBookings(bookingData);
+        }
+      } catch (error) {
+        console.error('Unable to refresh bookings list.', error);
+      }
+    };
+
+    const intervalId = window.setInterval(syncBookings, 30000);
+
+    const handleFocus = () => {
+      syncBookings();
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      isActive = false;
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [filters]);
+
   const refreshBookings = async (nextFilters = filters) => {
     const bookingData = await bookingApi.getBookings(nextFilters);
     setBookings(bookingData);
