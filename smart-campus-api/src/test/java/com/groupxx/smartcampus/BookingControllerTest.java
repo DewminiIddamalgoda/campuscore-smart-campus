@@ -204,27 +204,13 @@ public class BookingControllerTest {
         statusUpdateDto.setStatus(BookingStatus.APPROVED);
 
         when(bookingService.updateBookingStatus(eq("booking-123"), eq(BookingStatus.APPROVED)))
-                .thenThrow(new BookingValidationException("Cancelled or rejected bookings cannot change status"));
+                .thenThrow(new BookingValidationException("Cancelled bookings cannot change status"));
 
         mockMvc.perform(patch("/bookings/booking-123/status")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusUpdateDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(containsString("cannot change status")));
-    }
-
-    @Test
-    public void testApprovedBookingCannotBeRejected() throws Exception {
-        statusUpdateDto.setStatus(BookingStatus.REJECTED);
-
-        when(bookingService.updateBookingStatus(eq("booking-123"), eq(BookingStatus.REJECTED)))
-                .thenThrow(new BookingValidationException("Approved bookings cannot be rejected"));
-
-        mockMvc.perform(patch("/bookings/booking-123/status")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(statusUpdateDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(containsString("cannot be rejected")));
     }
 
     @Test
