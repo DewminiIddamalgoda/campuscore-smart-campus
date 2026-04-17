@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Button, Col, Container, Form, Row } from 'react-bootstrap';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './AuthPages.css';
 
@@ -52,11 +52,40 @@ const initialFormState = {
 const RegistrationPage = () => {
   const { role } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { registerStudent, registerAdmin, registerTechnician } = useAuth();
   const meta = ROLE_META[role];
   const [formData, setFormData] = useState(initialFormState);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const email = params.get('email');
+    const fullName = params.get('fullName');
+    const firstName = params.get('firstName');
+    const lastName = params.get('lastName');
+    const notice = params.get('message');
+
+    if (notice) {
+      setMessage({ type: 'info', text: notice });
+    }
+
+    if (!email && !fullName && !firstName && !lastName) {
+      return;
+    }
+
+    const nameSource = fullName || '';
+    const inferredFirstName = firstName || nameSource.split(' ')[0] || '';
+    const inferredLastName = lastName || nameSource.split(' ').slice(1).join(' ') || '';
+
+    setFormData((current) => ({
+      ...current,
+      firstName: inferredFirstName,
+      lastName: inferredLastName,
+      email: email || current.email,
+    }));
+  }, [location.search]);
 
   const selectedFacultyPrefix = useMemo(() => {
     const faculty = FACULTIES.find((item) => item.label === formData.faculty);

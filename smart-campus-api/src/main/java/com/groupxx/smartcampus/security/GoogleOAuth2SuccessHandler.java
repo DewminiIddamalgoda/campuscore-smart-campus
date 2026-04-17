@@ -45,19 +45,17 @@ public class GoogleOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             throw new AuthException(HttpStatus.BAD_REQUEST, "OAuth account does not contain an email address");
         }
 
-        AuthResponseDto authResponse = authService.loginWithOAuth(email, fullName, firstName, lastName);
+        try {
+            AuthResponseDto authResponse = authService.loginWithOAuth(email, fullName, firstName, lastName);
+            response.sendRedirect(buildRedirectUrl("/", authResponse));
+        } catch (AuthException ex) {
+            if (ex.getStatus() == HttpStatus.NOT_FOUND) {
+                response.sendRedirect(buildRegistrationRedirectUrl(email, fullName, firstName, lastName));
+                return;
+            }
 
-        String redirectUrl = UriComponentsBuilder.fromHttpUrl(frontendUrl)
-                .queryParam("token", url(authResponse.getToken()))
-                .queryParam("userId", url(authResponse.getUserId()))
-                .queryParam("fullName", url(authResponse.getFullName()))
-                .queryParam("email", url(authResponse.getEmail()))
-                .queryParam("role", url(authResponse.getRole() != null ? authResponse.getRole().name() : ""))
-                .queryParam("redirectPath", url(authResponse.getRedirectPath()))
-                .build(true)
-                .toUriString();
-
-        response.sendRedirect(redirectUrl);
+            throw ex;
+        }
     }
 
     private String getString(Map<String, Object> attributes, String key) {
@@ -67,5 +65,30 @@ public class GoogleOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
     private String url(String value) {
         return value == null ? "" : URLEncoder.encode(value, StandardCharsets.UTF_8);
+    }
+
+    private String buildRedirectUrl(String path, AuthResponseDto authResponse) {
+        return UriComponentsBuilder.fromHttpUrl(frontendUrl)
+                .path(path)
+                .queryParam("token", url(authResponse.getToken()))
+                .queryParam("userId", url(authResponse.getUserId()))
+                .queryParam("fullName", url(authResponse.getFullName()))
+                .queryParam("email", url(authResponse.getEmail()))
+                .queryParam("role", url(authResponse.getRole() != null ? authResponse.getRole().name() : ""))
+                .queryParam("redirectPath", url(authResponse.getRedirectPath()))
+                .build(true)
+                .toUriString();
+    }
+
+    private String buildRegistrationRedirectUrl(String email, String fullName, String firstName, String lastName) {
+        return UriComponentsBuilder.fromHttpUrl(frontendUrl)
+                .path("/register")
+                .queryParam("email", url(email))
+                .queryParam("fullName", url(fullName))
+                .queryParam("firstName", url(firstName))
+                .queryParam("lastName", url(lastName))
+                .queryParam("message", url("Google account not registered. Please choose a role to continue."))
+                .build(true)
+                .toUriString();
     }
 }

@@ -74,8 +74,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDto login(LoginRequestDto request) {
-        AppUser user = userRepository.findByEmailIgnoreCase(normalizeEmail(request.getEmail()))
-                .orElseThrow(() -> new AuthException(HttpStatus.NOT_FOUND, EMAIL_NOT_REGISTERED_ERROR));
+        AppUser user = resolveUserForPasswordLogin(request.getEmail(), request.getFullName(), request.getPassword());
 
         if (!normalizeName(request.getFullName()).equalsIgnoreCase(user.getFullName())) {
             throw new AuthException(HttpStatus.UNAUTHORIZED, INVALID_LOGIN_ERROR);
@@ -95,8 +94,8 @@ public class AuthServiceImpl implements AuthService {
             throw new AuthException(HttpStatus.BAD_REQUEST, "OAuth account does not contain an email address");
         }
 
-        AppUser user = userRepository.findByEmailIgnoreCase(normalizedEmail)
-                .orElseGet(() -> provisionOAuthStudent(normalizedEmail, fullName, firstName, lastName));
+        AppUser user = resolveUserForOAuth(normalizedEmail)
+                .orElseThrow(() -> new AuthException(HttpStatus.NOT_FOUND, "Google account not registered. Please register first"));
 
         return issueSession(user, "Login successful via Google");
     }
@@ -104,7 +103,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserProfileDto getCurrentUser(String token) {
         AuthSession session = resolveActiveSession(token);
-        AppUser user = userRepository.findByEmailIgnoreCase(session.getEmail())
+        AppUser user = userRepository.findByUserId(session.getUserId())
                 .orElseThrow(() -> new AuthException(HttpStatus.NOT_FOUND, "User not found"));
 
         return toProfileDto(user);
@@ -301,48 +300,37 @@ public class AuthServiceImpl implements AuthService {
         return "/admin/dashboard";
     }
 
-    private AppUser provisionOAuthStudent(String email, String fullName, String firstName, String lastName) {
-        AppUser user = new AppUser();
-        user.setFirstName(normalizeNameOrFallback(firstName, fullName, email));
-        user.setLastName(normalizeNameOrFallback(lastName, "", ""));
+    private AppUser resolveUserForPasswordLogin(String email, String fullName, String password) {
+        String normalizedEmail = normalizeEmail(email);
+        if (normalizedEmail == null || normalizedEmail.isBlank()) {
+            throw new AuthException(HttpStatus.NOT_FOUND, EMAIL_NOT_REGISTERED_ERROR);
+        }
 
-        String resolvedFullName = buildFullName(
-                normalizeNameOrFallback(firstName, fullName, email),
-                normalizeNameOrFallback(lastName, "", "")
-        ).trim();
-        user.setFullName(resolvedFullName.isBlank() ? email : resolvedFullName);
-        user.setEmail(email);
-        user.setContactNumber(generateUniqueContactNumber());
-        user.setRole(UserRole.STUDENT);
-        user.setFaculty(Faculty.COMPUTING);
-        user.setAcademicYear("Not provided");
-        user.setUserId(generateUniqueUserId("IT"));
-        user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
-        return userRepository.save(user);
+        return userRepository.findAllByEmailIgnoreCase(normalizedEmail).stream()
+                .filter(user -> normalizeName(fullName).equalsIgnoreCase(user.getFullName()))
+                .filter(user -> passwordEncoder.matches(password, user.getPasswordHash()))
+                .findFirst()
+                .orElseThrow(() -> {
+                    if (userRepository.findAllByEmailIgnoreCase(normalizedEmail).isEmpty()) {
+                        return new AuthException(HttpStatus.NOT_FOUND, EMAIL_NOT_REGISTERED_ERROR);
+                    }
+                    return new AuthException(HttpStatus.UNAUTHORIZED, INVALID_LOGIN_ERROR);
+                });
     }
 
-    private String normalizeNameOrFallback(String primary, String secondary, String tertiary) {
-        if (primary != null && !primary.isBlank()) {
-            return normalizeName(primary);
-        }
-        if (secondary != null && !secondary.isBlank()) {
-            return normalizeName(secondary);
-        }
-        if (tertiary != null && !tertiary.isBlank()) {
-            return normalizeName(tertiary.split("@")[0].replace('.', ' '));
-        }
-        return "";
+    private java.util.Optional<AppUser> resolveUserForOAuth(String email) {
+        return userRepository.findAllByEmailIgnoreCase(email).stream()
+                .sorted((left, right) -> Integer.compare(rolePriority(right.getRole()), rolePriority(left.getRole())))
+                .findFirst();
     }
 
-    private String generateUniqueContactNumber() {
-        for (int attempt = 0; attempt < 1000; attempt++) {
-            String candidate = "07" + String.format("%08d", (int) (Math.random() * 100_000_000));
-            if (!userRepository.existsByContactNumber(candidate)) {
-                return candidate;
-            }
+    private int rolePriority(UserRole role) {
+        if (role == UserRole.ADMIN) {
+            return 3;
         }
-        throw new AuthException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate contact number");
+        if (role == UserRole.TECHNICIAN) {
+            return 2;
+        }
+        return 1;
     }
 }

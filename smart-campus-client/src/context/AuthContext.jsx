@@ -45,6 +45,14 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const bootstrap = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const hasOAuthCallbackToken = params.has('token') && params.has('email');
+
+      if (hasOAuthCallbackToken) {
+        setInitializing(false);
+        return;
+      }
+
       const storedToken = localStorage.getItem(TOKEN_KEY);
       const storedUser = readStoredUser();
 
