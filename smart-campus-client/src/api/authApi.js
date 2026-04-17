@@ -22,6 +22,10 @@ const authApi = {
     const response = await axios.post(`${API_BASE_URL}/auth/register/technician`, payload);
     return response.data;
   },
+  updateProfile: async (payload) => {
+    const response = await axios.put(`${API_BASE_URL}/auth/me`, payload);
+    return response.data;
+  },
 };
 
 export default authApi;

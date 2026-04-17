@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
+import { FaUserCircle } from 'react-icons/fa';
 import './Header.css';
 
 const Header = ({ isAdmin = false }) => {
@@ -70,9 +71,10 @@ const Header = ({ isAdmin = false }) => {
               <>
                 {showAdminLinks && <Link to="/admin/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>}
                 {showAdminLinks && <Link to="/admin/resources" onClick={() => setMenuOpen(false)}>Manage</Link>}
-                <span className="sc-user-name" title={user?.fullName || 'Signed in user'}>
+                <Link to="/profile" onClick={() => setMenuOpen(false)} className="sc-user-name" title={user?.fullName || 'Profile'}>
+                  <FaUserCircle style={{ marginRight: 8 }} />
                   {getDisplayName()}
-                </span>
+                </Link>
                 <a href="#/" onClick={(e) => { e.preventDefault(); handleLogout(); setMenuOpen(false); }}>Logout</a>
               </>
             ) : (

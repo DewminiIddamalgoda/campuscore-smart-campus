@@ -6,6 +6,7 @@ import com.groupxx.smartcampus.dto.auth.LoginRequestDto;
 import com.groupxx.smartcampus.dto.auth.StudentRegistrationRequestDto;
 import com.groupxx.smartcampus.dto.auth.TechnicianRegistrationRequestDto;
 import com.groupxx.smartcampus.dto.auth.UserProfileDto;
+import com.groupxx.smartcampus.dto.auth.UpdateProfileRequestDto;
 import com.groupxx.smartcampus.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,12 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<UserProfileDto> me(@RequestHeader(value = "Authorization", required = false) String authorization) {
         return ResponseEntity.ok(authService.getCurrentUser(authorization));
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<UserProfileDto> updateProfile(@RequestHeader(value = "Authorization", required = false) String authorization,
+                                                        @RequestBody UpdateProfileRequestDto request) {
+        return ResponseEntity.ok(authService.updateProfile(authorization, request));
     }
 
     @PostMapping("/logout")

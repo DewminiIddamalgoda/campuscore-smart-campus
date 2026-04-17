@@ -22,6 +22,8 @@ import AdminTicketsPage from './pages/admin/AdminTicketsPage';
 import RegistrationSelectionPage from './pages/auth/RegistrationSelectionPage';
 import RegistrationPage from './pages/auth/RegistrationPage';
 import OAuthCallbackPage from './pages/auth/OAuthCallbackPage';
+import UserProfile from './pages/Profile/UserProfile';
+import EditProfile from './pages/Profile/EditProfile';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -56,6 +58,8 @@ function App() {
           <Route path="/register/:role" element={<UserLayout><RegistrationPage /></UserLayout>} />
           <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
           <Route path="/bookings" element={<UserLayout><BookingPage /></UserLayout>} />
+          <Route path="/profile" element={<ProtectedRoute><UserLayout><UserProfile /></UserLayout></ProtectedRoute>} />
+          <Route path="/profile/edit" element={<ProtectedRoute><UserLayout><EditProfile /></UserLayout></ProtectedRoute>} />
           <Route path="/resources" element={<UserLayout><ResourceListPage /></UserLayout>} />
           <Route path="/resources/:id" element={<UserLayout><ResourceDetailsPage /></UserLayout>} />
           <Route path="/resources/add" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><UserLayout><AddResourcePage /></UserLayout></ProtectedRoute>} />

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useToast } from '../components/common/ToastProvider.jsx';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 const TOKEN_KEY = 'campuscore_auth_token';
@@ -22,10 +23,13 @@ const normalizeUser = (payload) => {
   }
 
   return {
-    userId: payload.userId || '',
-    fullName: payload.fullName || '',
-    email: payload.email || '',
-    role: payload.role || '',
+    userId: payload.userId || payload.userId || '',
+    fullName: payload.fullName || payload.fullName || '',
+    email: payload.email || payload.email || '',
+    contactNumber: payload.contactNumber || payload.contactNumber || '',
+    role: payload.role || payload.role || '',
+    faculty: payload.faculty || null,
+    academicYear: payload.academicYear || null,
     redirectPath: payload.redirectPath || '/',
   };
 };
@@ -82,6 +86,8 @@ export const AuthProvider = ({ children }) => {
     bootstrap();
   }, []);
 
+  const toast = useToast();
+
   const saveSession = (authResponse) => {
     const nextToken = authResponse?.token || '';
     const nextUser = normalizeUser(authResponse);
@@ -92,6 +98,19 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem(TOKEN_KEY, nextToken);
     localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
     axios.defaults.headers.common.Authorization = `Bearer ${nextToken}`;
+    try {
+      if (authResponse?.message) {
+        toast.showToast('success', authResponse.message);
+      }
+    } catch (e) {
+      // ignore if toast not available
+    }
+  };
+
+  const updateLocalUser = (profile) => {
+    const nextUser = normalizeUser(profile) || user;
+    setUser(nextUser);
+    localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
   };
 
   const clearSession = () => {
@@ -160,6 +179,7 @@ export const AuthProvider = ({ children }) => {
     registerAdmin,
     registerTechnician,
     applySession: saveSession,
+    updateLocalUser,
     logout,
     clearSession,
     hasRole,

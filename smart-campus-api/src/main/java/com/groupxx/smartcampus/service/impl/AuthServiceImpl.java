@@ -7,6 +7,7 @@ import com.groupxx.smartcampus.dto.auth.StudentRegistrationRequestDto;
 import com.groupxx.smartcampus.dto.auth.StaffRegistrationRequestDto;
 import com.groupxx.smartcampus.dto.auth.TechnicianRegistrationRequestDto;
 import com.groupxx.smartcampus.dto.auth.UserProfileDto;
+import com.groupxx.smartcampus.dto.auth.UpdateProfileRequestDto;
 import com.groupxx.smartcampus.dto.auth.BaseRegistrationRequestDto;
 import com.groupxx.smartcampus.entity.AppUser;
 import com.groupxx.smartcampus.entity.AuthSession;
@@ -114,6 +115,35 @@ public class AuthServiceImpl implements AuthService {
         AuthSession session = resolveActiveSession(token);
         session.setRevoked(true);
         authSessionRepository.save(session);
+    }
+
+    @Override
+    public UserProfileDto updateProfile(String token, UpdateProfileRequestDto request) {
+        AuthSession session = resolveActiveSession(token);
+        AppUser user = userRepository.findByUserId(session.getUserId())
+                .orElseThrow(() -> new AuthException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (request.getContactNumber() != null && !request.getContactNumber().trim().isEmpty()) {
+            String normalizedContact = request.getContactNumber().trim();
+            if (!normalizedContact.equals(user.getContactNumber())) {
+                if (userRepository.existsByContactNumber(normalizedContact)) {
+                    throw new AuthException(HttpStatus.CONFLICT, "Contact number already registered");
+                }
+                user.setContactNumber(normalizedContact);
+            }
+        }
+
+        if (request.getNewPassword() != null && !request.getNewPassword().isBlank()) {
+            if (!passwordsMatch(request.getNewPassword(), request.getConfirmNewPassword())) {
+                throw new AuthException(HttpStatus.BAD_REQUEST, PASSWORD_MISMATCH_ERROR);
+            }
+            user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        }
+
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        return toProfileDto(user);
     }
 
     private AuthResponseDto registerStaff(StaffRegistrationRequestDto request, UserRole role, String prefix) {
