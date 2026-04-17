@@ -53,7 +53,7 @@
   bottom: -5px;
   width: 0;
   height: 2px;
-  background: linear-gradient(90deg, #06b6d4, #10b981);
+  background: linear-gradient(90deg, #ffffff, #f0f0f0);
   transition: width 0.3s ease;
 }
 
@@ -68,8 +68,8 @@
 
 .sc-nav-phone {
   padding: 11px 16px;
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.22), rgba(16, 185, 129, 0.22));
-  border: 1px solid rgba(6, 182, 212, 0.25);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(240, 240, 240, 0.22));
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 8px;
   color: #ffffff;
   font-weight: 600;
@@ -78,8 +78,8 @@
 }
 
 .sc-nav-phone:hover {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.32), rgba(16, 185, 129, 0.32));
-  border-color: rgba(6, 182, 212, 0.4);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.32), rgba(240, 240, 240, 0.32));
+  border-color: rgba(255, 255, 255, 0.4);
   color: #ffffff;
   text-decoration: none;
 }
@@ -187,7 +187,7 @@
 .sc-nav-links a:focus,
 .sc-nav-phone:focus,
 .sc-menu-toggle:focus {
-  outline: 2px solid #06b6d4;
+  outline: 2px solid #ffffff;
   outline-offset: 2px;
 }
 

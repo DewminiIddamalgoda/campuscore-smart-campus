@@ -28,6 +28,23 @@ import {
 } from 'react-icons/fa';
 import resourceApi from '../../api/resourceApi';
 
+const styles = `
+  .admin-resources .page-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  .admin-resources .page-header h2 {
+    font-weight: 700;
+    margin: 0;
+    font-size: 2rem;
+  }
+`;
+
 const AdminResources = () => {
   const navigate = useNavigate();
   const [resources, setResources] = useState([]);
@@ -41,6 +58,17 @@ const AdminResources = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertVariant, setAlertVariant] = useState('success');
+
+  // Inject custom styles
+  useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = styles;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -237,12 +265,14 @@ const AdminResources = () => {
           </Alert>
         )}
 
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="mb-0">Resource Management</h2>
-          <Button variant="primary" onClick={() => navigate('/admin/resources/add')}>
-            <FaPlus className="me-2" />
-            Add Resource
-          </Button>
+        <div className="page-header p-4 mb-4">
+          <div className="d-flex justify-content-between align-items-center">
+            <h2 className="mb-0">Resource Management</h2>
+            <Button variant="primary" onClick={() => navigate('/admin/resources/add')}>
+              <FaPlus className="me-2" />
+              Add Resource
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}
