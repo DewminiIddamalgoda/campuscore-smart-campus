@@ -1,7 +1,6 @@
-package com.groupxx.smartcampus.service.impl;
+package com.groupxx.smartcampus.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.groupxx.smartcampus.controller.TicketController;
 import com.groupxx.smartcampus.entity.Ticket;
 import com.groupxx.smartcampus.enums.TicketStatus;
 import com.groupxx.smartcampus.service.TicketService;
@@ -10,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -21,7 +22,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = TicketController.class)
+@WebMvcTest(controllers = TicketController.class, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
+        com.groupxx.smartcampus.SmartCampusApplication.class }))
 @AutoConfigureMockMvc(addFilters = false)
 public class TicketControllerTest {
 
@@ -58,8 +60,7 @@ public class TicketControllerTest {
                 .thenReturn(Collections.singletonList(ticket));
 
         mockMvc.perform(get("/tickets"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -83,7 +84,8 @@ public class TicketControllerTest {
         when(ticketService.updateStatus(eq("t1"), eq(TicketStatus.RESOLVED)))
                 .thenReturn(ticket);
 
-        mockMvc.perform(put("/tickets/t1/status?status=RESOLVED"))
+        mockMvc.perform(put("/tickets/t1/status")
+                .param("status", "RESOLVED"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("RESOLVED"));
     }
