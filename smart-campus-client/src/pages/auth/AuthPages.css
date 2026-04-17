@@ -137,6 +137,44 @@
   color: var(--secondary);
 }
 
+.password-rules {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.password-rule {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #64748b;
+  font-size: 13px;
+  transition: color 0.2s ease;
+}
+
+.password-rule.passed {
+  color: #059669;
+  font-weight: 700;
+}
+
+.rule-dot {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.16);
+  color: #64748b;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.password-rule.passed .rule-dot {
+  background: rgba(5, 150, 105, 0.12);
+  color: #059669;
+}
+
 @media (max-width: 768px) {
   .auth-page {
     padding-top: 105px;

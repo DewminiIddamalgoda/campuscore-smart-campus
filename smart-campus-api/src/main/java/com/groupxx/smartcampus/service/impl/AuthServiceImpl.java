@@ -121,7 +121,12 @@ public class AuthServiceImpl implements AuthService {
             throw new AuthException(HttpStatus.BAD_REQUEST, PASSWORD_MISMATCH_ERROR);
         }
 
-        String generatedUserId = generateUniqueUserId(prefix);
+        String providedUserId = normalizeUserId(request.getUserId());
+        String generatedUserId = (providedUserId == null || providedUserId.isBlank())
+                ? generateUniqueUserId(prefix)
+                : providedUserId;
+
+        validateUserId(generatedUserId, prefix);
         validateUniqueFields(request.getEmail(), request.getContactNumber(), generatedUserId);
 
         AppUser user = buildBaseUser(request, role);

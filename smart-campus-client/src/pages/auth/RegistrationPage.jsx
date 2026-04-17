@@ -49,6 +49,19 @@ const initialFormState = {
   confirmPassword: '',
 };
 
+const passwordRules = [
+  { id: 'length', label: 'At least 8 characters', test: (value) => value.length >= 8 },
+  { id: 'uppercase', label: '1 uppercase letter', test: (value) => /[A-Z]/.test(value) },
+  { id: 'lowercase', label: '1 lowercase letter', test: (value) => /[a-z]/.test(value) },
+  { id: 'number', label: '1 number', test: (value) => /\d/.test(value) },
+  { id: 'special', label: '1 special character', test: (value) => /[^A-Za-z0-9]/.test(value) },
+];
+
+const createStaffUserId = (prefix) => {
+  const digits = String(Math.floor(Math.random() * 100000000)).padStart(8, '0');
+  return `${prefix}${digits}`;
+};
+
 const RegistrationPage = () => {
   const { role } = useParams();
   const navigate = useNavigate();
@@ -58,6 +71,11 @@ const RegistrationPage = () => {
   const [formData, setFormData] = useState(initialFormState);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+
+  const selectedFacultyPrefix = useMemo(() => {
+    const faculty = FACULTIES.find((item) => item.label === formData.faculty);
+    return faculty?.prefix || 'IT';
+  }, [formData.faculty]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -71,26 +89,36 @@ const RegistrationPage = () => {
       setMessage({ type: 'info', text: notice });
     }
 
-    if (!email && !fullName && !firstName && !lastName) {
-      return;
-    }
-
     const nameSource = fullName || '';
     const inferredFirstName = firstName || nameSource.split(' ')[0] || '';
     const inferredLastName = lastName || nameSource.split(' ').slice(1).join(' ') || '';
 
+    setFormData((current) => {
+      const nextState = {
+        ...current,
+        firstName: inferredFirstName || current.firstName,
+        lastName: inferredLastName || current.lastName,
+        email: email || current.email,
+      };
+
+      if (role !== 'student' && !current.userId) {
+        nextState.userId = createStaffUserId(meta?.autoUserIdPrefix || 'AD');
+      }
+
+      return nextState;
+    });
+  }, [location.search, meta?.autoUserIdPrefix, role]);
+
+  useEffect(() => {
+    if (role === 'student') {
+      return;
+    }
+
     setFormData((current) => ({
       ...current,
-      firstName: inferredFirstName,
-      lastName: inferredLastName,
-      email: email || current.email,
+      userId: current.userId || createStaffUserId(meta?.autoUserIdPrefix || 'AD'),
     }));
-  }, [location.search]);
-
-  const selectedFacultyPrefix = useMemo(() => {
-    const faculty = FACULTIES.find((item) => item.label === formData.faculty);
-    return faculty?.prefix || 'IT';
-  }, [formData.faculty]);
+  }, [meta?.autoUserIdPrefix, role]);
 
   if (!meta) {
     return (
@@ -114,7 +142,14 @@ const RegistrationPage = () => {
   const validate = () => {
     const errors = [];
 
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.contactNumber || !formData.password || !formData.confirmPassword) {
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email ||
+      !formData.contactNumber ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
       errors.push('All required fields must be filled.');
     }
 
@@ -134,6 +169,8 @@ const RegistrationPage = () => {
       if (!formData.userId || !new RegExp(`^${selectedFacultyPrefix}\\d{8}$`).test(formData.userId.trim().toUpperCase())) {
         errors.push('Enter a valid user ID');
       }
+    } else if (!new RegExp(`^${meta.autoUserIdPrefix}\\d{8}$`).test(formData.userId.trim().toUpperCase())) {
+      errors.push('Enter a valid user ID');
     }
 
     return errors;
@@ -156,12 +193,12 @@ const RegistrationPage = () => {
       contactNumber: formData.contactNumber,
       password: formData.password,
       confirmPassword: formData.confirmPassword,
+      userId: formData.userId.trim().toUpperCase(),
     };
 
     if (role === 'student') {
       payload.faculty = formData.faculty;
       payload.academicYear = formData.academicYear;
-      payload.userId = formData.userId.trim().toUpperCase();
     }
 
     try {
@@ -186,6 +223,15 @@ const RegistrationPage = () => {
     }
   };
 
+  const passwordStrength = useMemo(
+    () =>
+      passwordRules.map((rule) => ({
+        ...rule,
+        passed: rule.test(formData.password),
+      })),
+    [formData.password],
+  );
+
   return (
     <div className="auth-page">
       <Container className="auth-shell">
@@ -208,7 +254,7 @@ const RegistrationPage = () => {
                 <Row className="g-3">
                   <Col md={6}>
                     <Form.Group>
-                      <Form.Label>First Name</Form.Label>
+                      <Form.Label>First Name*</Form.Label>
                       <Form.Control
                         className="auth-input"
                         name="firstName"
@@ -221,7 +267,7 @@ const RegistrationPage = () => {
 
                   <Col md={6}>
                     <Form.Group>
-                      <Form.Label>Last Name</Form.Label>
+                      <Form.Label>Last Name*</Form.Label>
                       <Form.Control
                         className="auth-input"
                         name="lastName"
@@ -234,7 +280,7 @@ const RegistrationPage = () => {
 
                   <Col md={6}>
                     <Form.Group>
-                      <Form.Label>{role === 'student' ? 'Student Email' : 'University Email'}</Form.Label>
+                      <Form.Label>{role === 'student' ? 'Student Email*' : 'University Email*'}</Form.Label>
                       <Form.Control
                         type="email"
                         className="auth-input"
@@ -248,7 +294,7 @@ const RegistrationPage = () => {
 
                   <Col md={6}>
                     <Form.Group>
-                      <Form.Label>Contact Number</Form.Label>
+                      <Form.Label>Contact Number*</Form.Label>
                       <Form.Control
                         className="auth-input"
                         name="contactNumber"
@@ -265,7 +311,7 @@ const RegistrationPage = () => {
                     <>
                       <Col md={6}>
                         <Form.Group>
-                          <Form.Label>Faculty</Form.Label>
+                          <Form.Label>Faculty*</Form.Label>
                           <Form.Select
                             className="auth-input"
                             name="faculty"
@@ -284,7 +330,7 @@ const RegistrationPage = () => {
 
                       <Col md={6}>
                         <Form.Group>
-                          <Form.Label>Academic Year</Form.Label>
+                          <Form.Label>Academic Year*</Form.Label>
                           <Form.Select
                             className="auth-input"
                             name="academicYear"
@@ -303,14 +349,14 @@ const RegistrationPage = () => {
 
                       <Col md={6}>
                         <Form.Group>
-                          <Form.Label>User Type</Form.Label>
+                          <Form.Label>User Type*</Form.Label>
                           <Form.Control className="auth-input" value="Student" readOnly />
                         </Form.Group>
                       </Col>
 
                       <Col md={6}>
                         <Form.Group>
-                          <Form.Label>User ID</Form.Label>
+                          <Form.Label>User ID*</Form.Label>
                           <Form.Control
                             className="auth-input"
                             name="userId"
@@ -332,19 +378,23 @@ const RegistrationPage = () => {
                     <>
                       <Col md={6}>
                         <Form.Group>
-                          <Form.Label>User Type</Form.Label>
+                          <Form.Label>User Type*</Form.Label>
                           <Form.Control className="auth-input" value={meta.roleLabel} readOnly />
                         </Form.Group>
                       </Col>
 
                       <Col md={6}>
                         <Form.Group>
-                          <Form.Label>User ID</Form.Label>
+                          <Form.Label>User ID*</Form.Label>
                           <Form.Control
                             className="auth-input"
-                            value={`Auto-generated ${meta.autoUserIdPrefix} + 8 digits`}
+                            name="userId"
+                            value={formData.userId}
                             readOnly
                           />
+                          <Form.Text className="text-muted">
+                            Automatically assigned staff ID.
+                          </Form.Text>
                         </Form.Group>
                       </Col>
                     </>
@@ -352,7 +402,7 @@ const RegistrationPage = () => {
 
                   <Col md={6}>
                     <Form.Group>
-                      <Form.Label>Password</Form.Label>
+                      <Form.Label>Password*</Form.Label>
                       <Form.Control
                         type="password"
                         className="auth-input"
@@ -361,12 +411,20 @@ const RegistrationPage = () => {
                         onChange={handleChange}
                         required
                       />
+                      <div className="password-rules">
+                        {passwordStrength.map((rule) => (
+                          <div key={rule.id} className={`password-rule ${rule.passed ? 'passed' : ''}`}>
+                            <span className="rule-dot">{rule.passed ? '✓' : '•'}</span>
+                            <span>{rule.label}</span>
+                          </div>
+                        ))}
+                      </div>
                     </Form.Group>
                   </Col>
 
                   <Col md={6}>
                     <Form.Group>
-                      <Form.Label>Confirm Password</Form.Label>
+                      <Form.Label>Confirm Password*</Form.Label>
                       <Form.Control
                         type="password"
                         className="auth-input"
@@ -375,6 +433,9 @@ const RegistrationPage = () => {
                         onChange={handleChange}
                         required
                       />
+                      {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                        <Form.Text className="text-danger">Passwords do not match</Form.Text>
+                      )}
                     </Form.Group>
                   </Col>
                 </Row>
