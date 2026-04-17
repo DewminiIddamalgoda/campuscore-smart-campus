@@ -2,65 +2,65 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, deployment]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, deployment]
 
 jobs:
   backend:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        
-    - name: Cache Maven packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
-        
-    - name: Build backend
-      run: |
-        cd smart-campus-api
-        mvn clean compile
-        
-    - name: Run backend tests
-      run: |
-        cd smart-campus-api
-        mvn test
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Build backend
+        run: |
+          cd smart-campus-api
+          mvn clean compile
+
+      - name: Run backend tests
+        run: |
+          cd smart-campus-api
+          mvn test
 
   frontend:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: smart-campus-client/package.json
-        
-    - name: Install dependencies
-      run: |
-        cd smart-campus-client
-        npm install
-        
-    - name: Build frontend
-      run: |
-        cd smart-campus-client
-        npm run build
-        
-    - name: Run frontend tests (if available)
-      run: |
-        cd smart-campus-client
-        npm test -- --watchAll=false
-      continue-on-error: true
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: smart-campus-client/package.json
+
+      - name: Install dependencies
+        run: |
+          cd smart-campus-client
+          npm install
+
+      - name: Build frontend
+        run: |
+          cd smart-campus-client
+          npm run build
+
+      - name: Run frontend tests (if available)
+        run: |
+          cd smart-campus-client
+          npm test -- --watchAll=false
+        continue-on-error: true
