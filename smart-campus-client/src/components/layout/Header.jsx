@@ -7,7 +7,7 @@ import './Header.css';
 const Header = ({ isAdmin = false }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { logout, isAuthenticated, hasRole } = useAuth();
+  const { logout, isAuthenticated, hasRole, user } = useAuth();
 
   const handleSmoothScroll = (e) => {
     const href = e.currentTarget.getAttribute('href');
@@ -26,6 +26,15 @@ const Header = ({ isAdmin = false }) => {
   const handleLogout = async () => {
     await logout();
     navigate('/');
+  };
+
+  const getDisplayName = () => {
+    if (!user?.fullName) {
+      return 'Account';
+    }
+
+    const parts = user.fullName.trim().split(/\s+/);
+    return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1]}` : parts[0];
   };
 
   const showAdminLinks = isAdmin || hasRole(['ADMIN', 'TECHNICIAN']);
@@ -61,6 +70,9 @@ const Header = ({ isAdmin = false }) => {
               <>
                 {showAdminLinks && <Link to="/admin/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>}
                 {showAdminLinks && <Link to="/admin/resources" onClick={() => setMenuOpen(false)}>Manage</Link>}
+                <span className="sc-user-name" title={user?.fullName || 'Signed in user'}>
+                  {getDisplayName()}
+                </span>
                 <a href="#/" onClick={(e) => { e.preventDefault(); handleLogout(); setMenuOpen(false); }}>Logout</a>
               </>
             ) : (

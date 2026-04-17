@@ -19,7 +19,7 @@ const HomePage = () => {
   const [googleOAuthEnabled, setGoogleOAuthEnabled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { login, applySession } = useAuth();
+  const { login, applySession, isAuthenticated, logout, hasRole, user } = useAuth();
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
   const slides = [
@@ -358,6 +358,21 @@ const HomePage = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
+  const handleLogout = async () => {
+    await logout();
+    navigate('/', { replace: true });
+    setMenuOpen(false);
+  };
+
+  const getDisplayName = () => {
+    if (!user?.fullName) {
+      return 'Account';
+    }
+
+    const parts = user.fullName.trim().split(/\s+/);
+    return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1]}` : parts[0];
+  };
+
   const renderStars = (rating) =>
     Array.from({ length: 5 }, (_, i) => (
       <i key={i} className={`fa ${i < rating ? 'fa-star' : 'fa-star-o'}`} />
@@ -390,6 +405,23 @@ const HomePage = () => {
               <Link to="/bookings" onClick={() => setMenuOpen(false)}>Bookings</Link>
               <a href="#testimonial" className="smoothScroll">Reviews</a>
               <a href="#faq" className="smoothScroll">FAQ</a>
+              {isAuthenticated ? (
+                <>
+                  {hasRole(['ADMIN', 'TECHNICIAN']) && (
+                    <Link to="/admin/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+                  )}
+                  <span className="sc-user-name" title={user?.fullName || 'Signed in user'}>
+                    {getDisplayName()}
+                  </span>
+                  <button type="button" className="sc-auth-link" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <a href="#login" className="smoothScroll" onClick={() => setMenuOpen(false)}>
+                  Log In
+                </a>
+              )}
             </div>
           </div>
         </Container>
