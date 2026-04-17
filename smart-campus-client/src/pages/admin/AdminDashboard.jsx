@@ -324,8 +324,6 @@
 // export default AdminDashboard;
 
 
-
-
 import React, { useState, useEffect } from 'react';
 import {
   Container,
@@ -375,7 +373,6 @@ const AdminDashboard = () => {
     totalCapacity: 0,
     totalBookings: 0,
     pendingRequests: 0,
-    // Specific resource type counts
     labs: 0,
     meetingRooms: 0,
     equipment: 0,
@@ -416,7 +413,6 @@ const AdminDashboard = () => {
         totalCapacity: overviewStats.totalCapacity || 0,
         totalBookings: overviewStats.totalBookings || 0,
         pendingRequests: overviewStats.pendingRequests || 0,
-        // Use real-time data from PDF analytics endpoint
         labs: pdfAnalytics?.analytics?.labs || 0,
         meetingRooms: pdfAnalytics?.analytics?.meetingRooms || 0,
         equipment: pdfAnalytics?.analytics?.equipment || 0,
@@ -614,7 +610,7 @@ const AdminDashboard = () => {
                     Live Data
                   </Badge>
                 </div>
-                <h2 className="fw-bold mb-2">Dashboard Overview</h2>
+                <h2 className="fw-bold mb-2 text-white">Dashboard Overview</h2>
                 <p className="mb-0 text-light opacity-75">
                   Monitor resources, bookings, requests, and status analytics in one place.
                 </p>
@@ -667,7 +663,6 @@ const AdminDashboard = () => {
           </Col> */}
         </Row>
 
-        {/* Specific Resource Type Stats */}
         <Row className="g-4 mb-4">
           <Col xl={3} lg={6} md={6}>
             <StatCard
@@ -801,6 +796,10 @@ const AdminDashboard = () => {
 
         .admin-dashboard .card {
           overflow: hidden;
+        }
+
+        .admin-dashboard h2 {
+          color: #ffffff !important;
         }
       `}</style>
     </div>

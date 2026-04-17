@@ -22,26 +22,33 @@ import {
   FaTrash, 
   FaSearch, 
   FaFilter,
-  FaEye,
-  FaCheckCircle,
-  FaTimesCircle
+  FaEye
 } from 'react-icons/fa';
 import resourceApi from '../../api/resourceApi';
 
 const styles = `
   .admin-resources .page-header {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    color: white;
     padding: 2rem 0;
     margin-bottom: 2rem;
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
 
-  .admin-resources .page-header h2 {
+  .admin-resources .page-header .resource-title {
+    color: #ffffff !important;
     font-weight: 700;
-    margin: 0;
+    margin: 0 !important;
     font-size: 2rem;
+  }
+
+  .admin-resources .page-header * {
+    color: inherit;
+  }
+
+  .admin-resources table thead th {
+    color: #000000 !important;
+    font-weight: 700;
   }
 `;
 
@@ -58,17 +65,6 @@ const AdminResources = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertVariant, setAlertVariant] = useState('success');
-
-  // Inject custom styles
-  useEffect(() => {
-    const styleElement = document.createElement('style');
-    styleElement.textContent = styles;
-    document.head.appendChild(styleElement);
-    
-    return () => {
-      document.head.removeChild(styleElement);
-    };
-  }, []);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -95,6 +91,16 @@ const AdminResources = () => {
   ];
 
   useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = styles;
+    document.head.appendChild(styleElement);
+
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
+
+  useEffect(() => {
     fetchResources();
   }, []);
 
@@ -116,14 +122,14 @@ const AdminResources = () => {
     if (resource) {
       setEditingResource(resource);
       setFormData({
-        name: resource.name,
-        type: resource.type,
-        capacity: resource.capacity,
-        location: resource.location,
-        status: resource.status,
-        availableFrom: resource.availableFrom,
-        availableTo: resource.availableTo,
-        description: resource.description
+        name: resource.name || '',
+        type: resource.type || 'LECTURE_HALL',
+        capacity: resource.capacity || '',
+        location: resource.location || '',
+        status: resource.status || 'ACTIVE',
+        availableFrom: resource.availableFrom || '',
+        availableTo: resource.availableTo || '',
+        description: resource.description || ''
       });
     } else {
       setEditingResource(null);
@@ -148,27 +154,27 @@ const AdminResources = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       if (editingResource) {
-        // Update existing resource
         const updatedResource = await resourceApi.updateResource(editingResource.id, formData);
-        setResources(resources.map(r => 
-          r.id === editingResource.id 
-            ? updatedResource
-            : r
+        setResources(resources.map((r) =>
+          r.id === editingResource.id ? updatedResource : r
         ));
         showSuccessAlert('Resource updated successfully!');
       } else {
-        // Add new resource
         const newResource = await resourceApi.createResource(formData);
         setResources([...resources, newResource]);
         showSuccessAlert('Resource added successfully!');
       }
-      
+
       handleCloseModal();
     } catch (err) {
-      showErrorAlert(editingResource ? 'Failed to update resource. Please try again.' : 'Failed to add resource. Please try again.');
+      showErrorAlert(
+        editingResource
+          ? 'Failed to update resource. Please try again.'
+          : 'Failed to add resource. Please try again.'
+      );
       console.error('Error saving resource:', err);
     }
   };
@@ -177,7 +183,7 @@ const AdminResources = () => {
     if (window.confirm('Are you sure you want to delete this resource?')) {
       try {
         await resourceApi.deleteResource(id);
-        setResources(resources.filter(r => r.id !== id));
+        setResources(resources.filter((r) => r.id !== id));
         showSuccessAlert('Resource deleted successfully!');
       } catch (err) {
         showErrorAlert('Failed to delete resource. Please try again.');
@@ -200,17 +206,19 @@ const AdminResources = () => {
     setTimeout(() => setShowAlert(false), 3000);
   };
 
-  const filteredResources = resources.filter(resource => {
-    const matchesSearch = resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         resource.location.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredResources = resources.filter((resource) => {
+    const matchesSearch =
+      resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.location.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesType = filterType === 'all' || resource.type === filterType;
     const matchesStatus = filterStatus === 'all' || resource.status === filterStatus;
-    
+
     return matchesSearch && matchesType && matchesStatus;
   });
 
   const getStatusBadge = (status) => {
-    const statusOption = statusOptions.find(s => s.value === status);
+    const statusOption = statusOptions.find((s) => s.value === status);
     return (
       <Badge bg={statusOption?.variant || 'secondary'}>
         {statusOption?.label || status}
@@ -219,7 +227,7 @@ const AdminResources = () => {
   };
 
   const getTypeLabel = (type) => {
-    const typeOption = resourceTypes.find(t => t.value === type);
+    const typeOption = resourceTypes.find((t) => t.value === type);
     return typeOption?.label || type;
   };
 
@@ -254,9 +262,9 @@ const AdminResources = () => {
     <div className="admin-resources">
       <Container fluid className="py-4">
         {showAlert && (
-          <Alert 
-            variant={alertVariant} 
-            className="position-fixed top-0 start-50 translate-middle-x mt-3" 
+          <Alert
+            variant={alertVariant}
+            className="position-fixed top-0 start-50 translate-middle-x mt-3"
             style={{ zIndex: 1050, minWidth: '300px' }}
             onClose={() => setShowAlert(false)}
             dismissible
@@ -267,7 +275,7 @@ const AdminResources = () => {
 
         <div className="page-header p-4 mb-4">
           <div className="d-flex justify-content-between align-items-center">
-            <h2 className="mb-0">Resource Management</h2>
+            <h2 className="mb-0 resource-title">Resource Management</h2>
             <Button variant="primary" onClick={() => navigate('/admin/resources/add')}>
               <FaPlus className="me-2" />
               Add Resource
@@ -275,7 +283,6 @@ const AdminResources = () => {
           </div>
         </div>
 
-        {/* Filters */}
         <Card className="mb-4 shadow-sm border-0">
           <Card.Body>
             <Row>
@@ -291,35 +298,38 @@ const AdminResources = () => {
                   />
                 </InputGroup>
               </Col>
+
               <Col md={3}>
                 <Form.Select
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
                 >
                   <option value="all">All Types</option>
-                  {resourceTypes.map(type => (
+                  {resourceTypes.map((type) => (
                     <option key={type.value} value={type.value}>
                       {type.label}
                     </option>
                   ))}
                 </Form.Select>
               </Col>
+
               <Col md={3}>
                 <Form.Select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
                 >
                   <option value="all">All Status</option>
-                  {statusOptions.map(status => (
+                  {statusOptions.map((status) => (
                     <option key={status.value} value={status.value}>
                       {status.label}
                     </option>
                   ))}
                 </Form.Select>
               </Col>
+
               <Col md={2}>
-                <Button 
-                  variant="outline-secondary" 
+                <Button
+                  variant="outline-secondary"
                   className="w-100"
                   onClick={() => {
                     setSearchTerm('');
@@ -335,7 +345,6 @@ const AdminResources = () => {
           </Card.Body>
         </Card>
 
-        {/* Resources Table */}
         <Card className="shadow-sm border-0">
           <Card.Body>
             <div className="table-responsive">
@@ -352,7 +361,7 @@ const AdminResources = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredResources.map(resource => (
+                  {filteredResources.map((resource) => (
                     <tr key={resource.id}>
                       <td>
                         <div>
@@ -380,14 +389,13 @@ const AdminResources = () => {
                               <FaEdit className="me-2" />
                               Edit
                             </Dropdown.Item>
-                            <Dropdown.Item 
-                              variant="danger" 
-                              onClick={() => handleDelete(resource.id)}
-                            >
+                            <Dropdown.Item onClick={() => handleDelete(resource.id)}>
                               <FaTrash className="me-2" />
                               Delete
                             </Dropdown.Item>
-                            <Dropdown.Item onClick={() => navigate(`/admin/resources/${resource.id}`)}>
+                            <Dropdown.Item
+                              onClick={() => navigate(`/admin/resources/${resource.id}`)}
+                            >
                               <FaEye className="me-2" />
                               View Details
                             </Dropdown.Item>
@@ -398,7 +406,7 @@ const AdminResources = () => {
                   ))}
                 </tbody>
               </Table>
-              
+
               {filteredResources.length === 0 && (
                 <div className="text-center py-4">
                   <p className="text-muted mb-0">No resources found</p>
@@ -408,13 +416,13 @@ const AdminResources = () => {
           </Card.Body>
         </Card>
 
-        {/* Add/Edit Modal */}
         <Modal show={showModal} onHide={handleCloseModal} size="lg">
           <Modal.Header closeButton>
             <Modal.Title>
               {editingResource ? 'Edit Resource' : 'Add New Resource'}
             </Modal.Title>
           </Modal.Header>
+
           <Form onSubmit={handleSubmit}>
             <Modal.Body>
               <Row>
@@ -425,19 +433,24 @@ const AdminResources = () => {
                       type="text"
                       required
                       value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
                     />
                   </Form.Group>
                 </Col>
+
                 <Col md={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Type *</Form.Label>
                     <Form.Select
                       required
                       value={formData.type}
-                      onChange={(e) => setFormData({...formData, type: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, type: e.target.value })
+                      }
                     >
-                      {resourceTypes.map(type => (
+                      {resourceTypes.map((type) => (
                         <option key={type.value} value={type.value}>
                           {type.label}
                         </option>
@@ -446,7 +459,7 @@ const AdminResources = () => {
                   </Form.Group>
                 </Col>
               </Row>
-              
+
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
@@ -456,10 +469,13 @@ const AdminResources = () => {
                       required
                       min="1"
                       value={formData.capacity}
-                      onChange={(e) => setFormData({...formData, capacity: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, capacity: e.target.value })
+                      }
                     />
                   </Form.Group>
                 </Col>
+
                 <Col md={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Location *</Form.Label>
@@ -467,21 +483,25 @@ const AdminResources = () => {
                       type="text"
                       required
                       value={formData.location}
-                      onChange={(e) => setFormData({...formData, location: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, location: e.target.value })
+                      }
                     />
                   </Form.Group>
                 </Col>
               </Row>
-              
+
               <Row>
                 <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Status</Form.Label>
                     <Form.Select
                       value={formData.status}
-                      onChange={(e) => setFormData({...formData, status: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, status: e.target.value })
+                      }
                     >
-                      {statusOptions.map(status => (
+                      {statusOptions.map((status) => (
                         <option key={status.value} value={status.value}>
                           {status.label}
                         </option>
@@ -489,39 +509,48 @@ const AdminResources = () => {
                     </Form.Select>
                   </Form.Group>
                 </Col>
+
                 <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Available From</Form.Label>
                     <Form.Control
                       type="time"
                       value={formData.availableFrom}
-                      onChange={(e) => setFormData({...formData, availableFrom: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, availableFrom: e.target.value })
+                      }
                     />
                   </Form.Group>
                 </Col>
+
                 <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Available To</Form.Label>
                     <Form.Control
                       type="time"
                       value={formData.availableTo}
-                      onChange={(e) => setFormData({...formData, availableTo: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, availableTo: e.target.value })
+                      }
                     />
                   </Form.Group>
                 </Col>
               </Row>
-              
+
               <Form.Group className="mb-3">
                 <Form.Label>Description</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
                   value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   placeholder="Enter resource description..."
                 />
               </Form.Group>
             </Modal.Body>
+
             <Modal.Footer>
               <Button variant="secondary" onClick={handleCloseModal}>
                 Cancel
