@@ -1,7 +1,9 @@
 package com.groupxx.smartcampus.service;
 
+import com.groupxx.smartcampus.entity.AppUser;
 import com.groupxx.smartcampus.entity.Ticket;
 import com.groupxx.smartcampus.enums.TicketStatus;
+import com.groupxx.smartcampus.repository.AppUserRepository;
 import com.groupxx.smartcampus.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,12 @@ public class TicketService {
 
     @Autowired
     private TicketRepository ticketRepository;
+
+    @Autowired
+    private AppUserRepository userRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     // Create Ticket
     public Ticket createTicket(Ticket ticket) {
@@ -43,7 +51,17 @@ public class TicketService {
         Ticket ticket = getTicketById(id);
         ticket.setStatus(status);
         ticket.setUpdatedAt(LocalDateTime.now());
-        return ticketRepository.save(ticket);
+        Ticket saved = ticketRepository.save(ticket);
+
+        String ownerEmail = userRepository.findByUserId(ticket.getUserId())
+                .map(AppUser::getEmail).orElse(null);
+        String msg = "Your ticket '" + ticket.getTitle() + "' status has been updated to " + status.name() + ".";
+        if (ownerEmail != null) {
+            notificationService.createUserNotification(ownerEmail, "TICKET_STATUS", msg, ticket.getId(), null);
+        }
+        notificationService.createSystemNotification("TICKET_STATUS", msg, ticket.getId(), null);
+
+        return saved;
     }
 
     // Assign Technician

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
+import { FaUserCircle } from 'react-icons/fa';
 import './HomePage.css';
 
 const HomePage = () => {
@@ -410,9 +411,10 @@ const HomePage = () => {
                   {hasRole(['ADMIN', 'TECHNICIAN']) && (
                     <Link to="/admin/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
                   )}
-                  <span className="sc-user-name" title={user?.fullName || 'Signed in user'}>
+                  <Link to="/profile" onClick={() => setMenuOpen(false)} className="sc-user-name" title={user?.fullName || 'Profile'}>
+                    <FaUserCircle style={{ marginRight: 8 }} />
                     {getDisplayName()}
-                  </span>
+                  </Link>
                   <button type="button" className="sc-auth-link" onClick={handleLogout}>
                     Logout
                   </button>

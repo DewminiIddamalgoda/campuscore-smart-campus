@@ -22,6 +22,10 @@ import AdminTicketsPage from './pages/admin/AdminTicketsPage';
 import RegistrationSelectionPage from './pages/auth/RegistrationSelectionPage';
 import RegistrationPage from './pages/auth/RegistrationPage';
 import OAuthCallbackPage from './pages/auth/OAuthCallbackPage';
+import UserProfile from './pages/Profile/UserProfile';
+import EditProfile from './pages/Profile/EditProfile';
+import UserNotificationsPage from './pages/Profile/UserNotificationsPage';
+import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -56,6 +60,9 @@ function App() {
           <Route path="/register/:role" element={<UserLayout><RegistrationPage /></UserLayout>} />
           <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
           <Route path="/bookings" element={<UserLayout><BookingPage /></UserLayout>} />
+          <Route path="/profile" element={<ProtectedRoute><UserLayout><UserProfile /></UserLayout></ProtectedRoute>} />
+          <Route path="/profile/edit" element={<ProtectedRoute><UserLayout><EditProfile /></UserLayout></ProtectedRoute>} />
+          <Route path="/profile/notifications" element={<ProtectedRoute><UserLayout><UserNotificationsPage /></UserLayout></ProtectedRoute>} />
           <Route path="/resources" element={<UserLayout><ResourceListPage /></UserLayout>} />
           <Route path="/resources/:id" element={<UserLayout><ResourceDetailsPage /></UserLayout>} />
           <Route path="/resources/add" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><UserLayout><AddResourcePage /></UserLayout></ProtectedRoute>} />
@@ -70,6 +77,7 @@ function App() {
           <Route path="/admin/resources/:id" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AdminResourceDetails /></AdminLayoutWrapper></ProtectedRoute>} />
           <Route path="/admin/resources/add" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AddResourceAdmin /></AdminLayoutWrapper></ProtectedRoute>} />
           <Route path="/admin/tickets" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AdminTicketsPage /></AdminLayoutWrapper></ProtectedRoute>} />
+          <Route path="/admin/notifications" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AdminNotificationsPage /></AdminLayoutWrapper></ProtectedRoute>} />
           
           
           {/* Test Routes */}

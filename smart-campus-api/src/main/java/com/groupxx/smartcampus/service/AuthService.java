@@ -6,6 +6,7 @@ import com.groupxx.smartcampus.dto.auth.LoginRequestDto;
 import com.groupxx.smartcampus.dto.auth.StudentRegistrationRequestDto;
 import com.groupxx.smartcampus.dto.auth.TechnicianRegistrationRequestDto;
 import com.groupxx.smartcampus.dto.auth.UserProfileDto;
+import com.groupxx.smartcampus.dto.auth.UpdateProfileRequestDto;
 
 public interface AuthService {
 
@@ -20,6 +21,8 @@ public interface AuthService {
     AuthResponseDto loginWithOAuth(String email, String fullName, String firstName, String lastName);
 
     UserProfileDto getCurrentUser(String token);
+
+    UserProfileDto updateProfile(String token, UpdateProfileRequestDto request);
 
     void logout(String token);
 }
