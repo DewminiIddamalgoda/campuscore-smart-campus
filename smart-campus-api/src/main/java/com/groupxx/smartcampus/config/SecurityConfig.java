@@ -52,7 +52,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/**", "/oauth2/**", "/login/oauth2/**", "/uploads/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/resources/**", "/bookings/**", "/tickets/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/resources/**", "/bookings/**", "/tickets/**", "/analytics/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/bookings").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/bookings/**").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers(HttpMethod.PATCH, "/bookings/**").hasAnyRole("ADMIN", "TECHNICIAN")
@@ -60,8 +60,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/resources/**").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers(HttpMethod.PUT, "/resources/**").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers(HttpMethod.DELETE, "/resources/**").hasAnyRole("ADMIN", "TECHNICIAN")
-                        .requestMatchers("/analytics/**").hasAnyRole("ADMIN", "TECHNICIAN")
-                        .anyRequest().permitAll())
+                                                .anyRequest().permitAll())
                 .addFilterBefore(bearerTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         if (googleOAuthEnabled) {
