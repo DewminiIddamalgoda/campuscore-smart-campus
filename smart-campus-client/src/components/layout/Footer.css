@@ -19,7 +19,7 @@
 .footer-glow-1 {
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, #4a90e2 0%, transparent 70%);
+  background: radial-gradient(circle, #ffffff 0%, transparent 70%);
   top: -100px;
   left: -100px;
 }
@@ -27,7 +27,7 @@
 .footer-glow-2 {
   width: 350px;
   height: 350px;
-  background: radial-gradient(circle, #7b68ee 0%, transparent 70%);
+  background: radial-gradient(circle, #ffffff 0%, transparent 70%);
   bottom: -50px;
   right: -50px;
 }
@@ -46,8 +46,8 @@
 
 .footer-cta .footer-badge {
   display: inline-block;
-  background: linear-gradient(45deg, #4a90e2, #7b68ee);
-  color: white;
+  background: linear-gradient(45deg, #ffffff, #f0f0f0);
+  color: #1a1a2e;
   padding: 6px 16px;
   border-radius: 20px;
   font-size: 12px;
@@ -94,13 +94,13 @@
 }
 
 .footer-cta-btn.primary {
-  background: linear-gradient(45deg, #4a90e2, #7b68ee);
-  color: white;
+  background: linear-gradient(45deg, #ffffff, #f0f0f0);
+  color: #1a1a2e;
 }
 
 .footer-cta-btn.primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
 }
 
 .footer-cta-btn.secondary {
@@ -139,7 +139,7 @@
   left: 0;
   width: 40px;
   height: 3px;
-  background: linear-gradient(45deg, #4a90e2, #7b68ee);
+  background: linear-gradient(45deg, #ffffff, #f0f0f0);
   border-radius: 2px;
 }
 
@@ -157,14 +157,14 @@
 .footer-logo-icon {
   width: 50px;
   height: 50px;
-  background: linear-gradient(45deg, #4a90e2, #7b68ee);
+  background: linear-gradient(45deg, #ffffff, #f0f0f0);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 15px;
   font-size: 1.5rem;
-  color: white;
+  color: #1a1a2e;
 }
 
 .footer-logo-wrap h3 {
@@ -209,8 +209,8 @@
 }
 
 .footer-socials a:hover {
-  background: linear-gradient(45deg, #4a90e2, #7b68ee);
-  color: white;
+  background: linear-gradient(45deg, #ffffff, #f0f0f0);
+  color: #1a1a2e;
   transform: translateY(-2px);
 }
 
@@ -243,7 +243,7 @@
   transform: translateY(-50%);
   width: 0;
   height: 2px;
-  background: linear-gradient(45deg, #4a90e2, #7b68ee);
+  background: linear-gradient(45deg, #ffffff, #f0f0f0);
   transition: width 0.3s ease;
 }
 
@@ -303,22 +303,23 @@
 .modern-input.footer-input:focus {
   outline: none;
   background: rgba(255, 255, 255, 0.15);
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  border-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
 .modern-btn.footer-subscribe-btn {
-  background: linear-gradient(45deg, #4a90e2, #7b68ee);
+  background: linear-gradient(45deg, #ffffff, #f0f0f0);
   border: none;
   padding: 12px 24px;
   border-radius: 10px;
   font-weight: 600;
+  color: #1a1a2e;
   transition: all 0.3s ease;
 }
 
 .modern-btn.footer-subscribe-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
 }
 
 .footer-contact-mini {
@@ -336,7 +337,7 @@
 }
 
 .mini-contact-item i {
-  color: #4a90e2;
+  color: #ffffff;
   font-size: 0.9rem;
   width: 16px;
 }
@@ -462,11 +463,9 @@
 .footer-socials a:focus,
 .modern-input.footer-input:focus,
 .modern-btn.footer-subscribe-btn:focus {
-  outline: 2px solid #4a90e2;
+  outline: 2px solid #ffffff;
   outline-offset: 2px;
 }
-
-
 
 .enhanced-support {
   background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));

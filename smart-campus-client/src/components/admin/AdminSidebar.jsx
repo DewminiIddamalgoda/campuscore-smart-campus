@@ -50,11 +50,6 @@ const AdminSidebar = () => {
       label: 'QR Check-in'
     },
     {
-      path: '/admin/analytics',
-      icon: <FaChartBar />,
-      label: 'Analytics'
-    },
-    {
       path: '/admin/users',
       icon: <FaUsers />,
       label: 'Users'
@@ -65,10 +60,9 @@ const AdminSidebar = () => {
       label: 'Notifications'
     },
     {
-      path: '/admin/settings',
-      icon: <FaCog />,
-      label: 'Settings'
-    }
+      path: '/',
+      label: 'Home'
+    },
   ];
 
   return (

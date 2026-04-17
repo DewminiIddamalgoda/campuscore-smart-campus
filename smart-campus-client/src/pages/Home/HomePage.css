@@ -60,7 +60,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: var(--text);
+  color: #0f172a !important;
   font-weight: 700;
   line-height: 1.2;
   margin: 0;
@@ -366,7 +366,7 @@ p {
 
 .hero-content h1 {
   font-size: 70px;
-  color: var(--white);
+  color: #ffffff !important;
   margin-bottom: 22px;
   max-width: 760px;
   text-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
@@ -434,7 +434,7 @@ p {
 }
 
 .hero-dot.active {
-  background: linear-gradient(90deg, var(--accent), var(--pink));
+  background: linear-gradient(90deg, #ffffff, #f0f0f0);
   transform: scale(1.2);
 }
 
@@ -462,7 +462,7 @@ p {
   width: 56px;
   height: 56px;
   border-radius: 16px;
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.14), rgba(139, 92, 246, 0.14));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(240, 240, 240, 0.14));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -501,14 +501,14 @@ p {
   width: 58px;
   height: 58px;
   border-radius: 16px;
-  background: linear-gradient(135deg, var(--primary), var(--purple));
-  color: var(--white);
+  background: linear-gradient(135deg, #ffffff, #f0f0f0);
+  color: var(--primary);
   font-size: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 12px 20px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 12px 20px rgba(255, 255, 255, 0.2);
 }
 
 .about-item h4 {
@@ -580,7 +580,7 @@ p {
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.14), rgba(236, 72, 153, 0.14));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(240, 240, 240, 0.14));
   color: var(--primary);
   display: flex;
   align-items: center;
@@ -616,8 +616,8 @@ p {
   bottom: 16px;
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.72);
-  color: var(--white);
+  background: rgba(0, 0, 0, 0.9);
+  color: #ffffff;
   font-size: 13px;
   font-weight: 700;
 }
@@ -737,7 +737,7 @@ p {
   height: 58px;
   border-radius: 16px;
   margin-bottom: 18px;
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.14), rgba(139, 92, 246, 0.14));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(240, 240, 240, 0.14));
   color: var(--secondary);
   display: flex;
   align-items: center;
