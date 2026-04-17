@@ -13,6 +13,7 @@ import com.groupxx.smartcampus.exception.ResourceNotFoundException;
 import com.groupxx.smartcampus.repository.BookingRepository;
 import com.groupxx.smartcampus.repository.ResourceRepository;
 import com.groupxx.smartcampus.service.BookingService;
+import com.groupxx.smartcampus.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private ResourceRepository resourceRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public BookingResponseDto createBooking(BookingRequestDto bookingDto) {
@@ -204,7 +208,25 @@ public class BookingServiceImpl implements BookingService {
             clearQrData(booking);
         }
 
-        return convertToResponseDto(bookingRepository.save(booking));
+        BookingResponseDto result = convertToResponseDto(bookingRepository.save(booking));
+
+        Resource notifResource = resourceRepository.findById(booking.getResourceId()).orElse(null);
+        String rName = notifResource != null ? notifResource.getName() : "a resource";
+        if (status == BookingStatus.APPROVED) {
+            notificationService.createUserNotification(
+                booking.getBookedByEmail(), "BOOKING_APPROVED",
+                "Your booking for " + rName + " on " + booking.getBookingDate() + " has been approved.",
+                booking.getId(), rName);
+        } else if (status == BookingStatus.REJECTED) {
+            String reason = (rejectionReason != null && !rejectionReason.isBlank())
+                ? " Reason: " + rejectionReason : "";
+            notificationService.createUserNotification(
+                booking.getBookedByEmail(), "BOOKING_REJECTED",
+                "Your booking for " + rName + " on " + booking.getBookingDate() + " has been rejected." + reason,
+                booking.getId(), rName);
+        }
+
+        return result;
     }
 
     @Override

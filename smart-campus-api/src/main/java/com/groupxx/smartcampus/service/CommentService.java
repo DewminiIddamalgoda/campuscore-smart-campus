@@ -1,7 +1,11 @@
 package com.groupxx.smartcampus.service;
 
+import com.groupxx.smartcampus.entity.AppUser;
 import com.groupxx.smartcampus.entity.Comment;
+import com.groupxx.smartcampus.entity.Ticket;
+import com.groupxx.smartcampus.repository.AppUserRepository;
 import com.groupxx.smartcampus.repository.CommentRepository;
+import com.groupxx.smartcampus.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +18,34 @@ public class CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
+    @Autowired
+    private TicketRepository ticketRepository;
+
+    @Autowired
+    private AppUserRepository userRepository;
+
+    @Autowired
+    private NotificationService notificationService;
+
     // Add Comment
     public Comment addComment(Comment comment) {
         comment.setCreatedAt(LocalDateTime.now());
-        return commentRepository.save(comment);
+        Comment saved = commentRepository.save(comment);
+
+        ticketRepository.findById(comment.getTicketId()).ifPresent(ticket -> {
+            String ownerEmail = userRepository.findByUserId(ticket.getUserId())
+                    .map(AppUser::getEmail).orElse(null);
+            if (ownerEmail != null && !ownerEmail.equals(
+                    userRepository.findByUserId(comment.getUserId()).map(AppUser::getEmail).orElse(null))) {
+                notificationService.createUserNotification(ownerEmail, "TICKET_COMMENT",
+                        "A new comment was added on your ticket '" + ticket.getTitle() + "'.",
+                        ticket.getId(), null);
+            }
+            notificationService.createSystemNotification("TICKET_COMMENT",
+                    "New comment on ticket '" + ticket.getTitle() + "'.", ticket.getId(), null);
+        });
+
+        return saved;
     }
 
     // Get Comments by Ticket

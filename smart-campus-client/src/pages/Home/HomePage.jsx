@@ -1,11 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Container, Row, Col } from 'react-bootstrap';
+import { useAuth } from '../../context/AuthContext';
+import { FaUserCircle } from 'react-icons/fa';
 import './HomePage.css';
 
 const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loginForm, setLoginForm] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+  });
+  const [loginState, setLoginState] = useState({
+    loading: false,
+    error: '',
+  });
+  const [googleOAuthEnabled, setGoogleOAuthEnabled] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { login, applySession, isAuthenticated, logout, hasRole, user } = useAuth();
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
   const slides = [
     {
@@ -223,6 +239,41 @@ const HomePage = () => {
   }, [slides.length]);
 
   useEffect(() => {
+    const shouldScrollToLogin = location.state?.scrollToLogin || location.hash === '#login';
+    if (shouldScrollToLogin) {
+      window.requestAnimationFrame(() => {
+        document.getElementById('login')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }, [location.hash, location.state]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+    const userId = params.get('userId');
+    const fullName = params.get('fullName');
+    const email = params.get('email');
+    const role = params.get('role');
+    const redirectPath = params.get('redirectPath') || '/';
+
+    if (!token || !email) {
+      return;
+    }
+
+    applySession({
+      token,
+      userId,
+      fullName,
+      email,
+      role,
+      redirectPath,
+    });
+
+    const cleanPath = redirectPath === '/admin/dashboard' ? '/admin/dashboard' : redirectPath;
+    navigate(cleanPath, { replace: true });
+  }, [applySession, location.search, navigate]);
+
+  useEffect(() => {
     const handleSmoothScroll = (e) => {
       const href = e.currentTarget.getAttribute('href');
       if (!href || !href.startsWith('#')) return;
@@ -249,12 +300,78 @@ const HomePage = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const loadOAuthAvailability = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/oauth/google/enabled`);
+        if (!response.ok) {
+          setGoogleOAuthEnabled(false);
+          return;
+        }
+
+        const data = await response.json();
+        setGoogleOAuthEnabled(Boolean(data?.enabled));
+      } catch {
+        setGoogleOAuthEnabled(false);
+      }
+    };
+
+    loadOAuthAvailability();
+  }, [API_BASE_URL]);
+
+  const handleLoginChange = (event) => {
+    const { name, value } = event.target;
+    setLoginForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  const handleLoginSubmit = async (event) => {
+    event.preventDefault();
+    setLoginState({ loading: true, error: '' });
+
+    try {
+      const response = await login(loginForm);
+      navigate(response.redirectPath || '/', { replace: true });
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.details ||
+        'Unable to log in right now.';
+
+      window.alert(errorMessage);
+      setLoginState({
+        loading: false,
+        error: errorMessage,
+      });
+      return;
+    }
+
+    setLoginState({ loading: false, error: '' });
+  };
+
   const goToNextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
   const goToPrevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/', { replace: true });
+    setMenuOpen(false);
+  };
+
+  const getDisplayName = () => {
+    if (!user?.fullName) {
+      return 'Account';
+    }
+
+    const parts = user.fullName.trim().split(/\s+/);
+    return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1]}` : parts[0];
   };
 
   const renderStars = (rating) =>
@@ -289,6 +406,24 @@ const HomePage = () => {
               <Link to="/bookings" onClick={() => setMenuOpen(false)}>Bookings</Link>
               <a href="#testimonial" className="smoothScroll">Reviews</a>
               <a href="#faq" className="smoothScroll">FAQ</a>
+              {isAuthenticated ? (
+                <>
+                  {hasRole(['ADMIN', 'TECHNICIAN']) && (
+                    <Link to="/admin/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+                  )}
+                  <Link to="/profile" onClick={() => setMenuOpen(false)} className="sc-user-name" title={user?.fullName || 'Profile'}>
+                    <FaUserCircle style={{ marginRight: 8 }} />
+                    {getDisplayName()}
+                  </Link>
+                  <button type="button" className="sc-auth-link" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <a href="#login" className="smoothScroll" onClick={() => setMenuOpen(false)}>
+                  Log In
+                </a>
+              )}
             </div>
           </div>
         </Container>
@@ -423,21 +558,72 @@ const HomePage = () => {
             </Col>
 
             <Col lg={5} md={12}>
-              <div className="modern-card login-card">
+              <div className="modern-card login-card" id="login">
                 <h3>Login to Dashboard</h3>
                 <p>Access your campus system account securely.</p>
 
-                <form>
-                  <input type="text" className="modern-input" placeholder="Full name" required />
-                  <input type="email" className="modern-input" placeholder="University email" required />
-                  <input type="password" className="modern-input" placeholder="Password" required />
-                  <Button className="w-100 modern-btn" variant="primary">
-                    Sign In
+                {location.state?.authMessage && (
+                  <div className="login-inline-alert">
+                    {location.state.authMessage}
+                  </div>
+                )}
+
+                {loginState.error && (
+                  <div className="login-inline-alert danger">
+                    {loginState.error}
+                  </div>
+                )}
+
+                <form onSubmit={handleLoginSubmit}>
+                  <input
+                    type="text"
+                    className="modern-input"
+                    placeholder="Full name"
+                    name="fullName"
+                    value={loginForm.fullName}
+                    onChange={handleLoginChange}
+                    required
+                  />
+                  <input
+                    type="email"
+                    className="modern-input"
+                    placeholder="University email"
+                    name="email"
+                    value={loginForm.email}
+                    onChange={handleLoginChange}
+                    required
+                  />
+                  <input
+                    type="password"
+                    className="modern-input"
+                    placeholder="Password"
+                    name="password"
+                    value={loginForm.password}
+                    onChange={handleLoginChange}
+                    required
+                  />
+                  <Button className="w-100 modern-btn" variant="primary" type="submit" disabled={loginState.loading}>
+                    {loginState.loading ? 'Logging In...' : 'Log In'}
                   </Button>
                 </form>
 
+                {googleOAuthEnabled && (
+                  <Button
+                    type="button"
+                    variant="light"
+                    className="w-100 mt-3 oauth-btn"
+                    onClick={() => {
+                      window.location.href = `${API_BASE_URL}/oauth2/authorization/google`;
+                    }}
+                  >
+                    Continue with Google
+                  </Button>
+                )}
+
                 <div className="login-note">
-                  OAuth login can be connected here later.
+                  <Link to="/register" className="login-register-link">
+                    Don&apos;t have an account? Register here
+                  </Link>
                 </div>
               </div>
             </Col>
