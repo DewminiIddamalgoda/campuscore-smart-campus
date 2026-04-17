@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import AdminLayout from './components/admin/AdminLayout';
+import ProtectedRoute from './components/routes/ProtectedRoute';
 import HomePage from './pages/Home/HomePage';
 import BookingPage from './pages/bookings/BookingPage';
 import ResourceListPage from './pages/resources/ResourceListPage';
@@ -18,6 +19,8 @@ import AdminResourceDetails from './pages/resources/adminResourceDetails';
 import TestPage from './pages/TestPage';
 import TicketsPage from './pages/SupportTicket/TicketsPage';
 import AdminTicketsPage from './pages/admin/AdminTicketsPage';
+import RegistrationSelectionPage from './pages/auth/RegistrationSelectionPage';
+import RegistrationPage from './pages/auth/RegistrationPage';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -48,21 +51,23 @@ function App() {
         <Routes>
           {/* User Routes */}
           <Route path="/" element={<UserLayout><HomePage /></UserLayout>} />
+          <Route path="/register" element={<UserLayout><RegistrationSelectionPage /></UserLayout>} />
+          <Route path="/register/:role" element={<UserLayout><RegistrationPage /></UserLayout>} />
           <Route path="/bookings" element={<UserLayout><BookingPage /></UserLayout>} />
           <Route path="/resources" element={<UserLayout><ResourceListPage /></UserLayout>} />
           <Route path="/resources/:id" element={<UserLayout><ResourceDetailsPage /></UserLayout>} />
-          <Route path="/resources/add" element={<UserLayout><AddResourcePage /></UserLayout>} />
-          <Route path="/resources/edit/:id" element={<UserLayout><EditResourcePage /></UserLayout>} />
+          <Route path="/resources/add" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><UserLayout><AddResourcePage /></UserLayout></ProtectedRoute>} />
+          <Route path="/resources/edit/:id" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><UserLayout><EditResourcePage /></UserLayout></ProtectedRoute>} />
           <Route path="/tickets" element={<UserLayout><TicketsPage /></UserLayout>} />
           
           {/* Admin Routes */}
-          <Route path="/admin/dashboard" element={<AdminLayoutWrapper><AdminDashboard /></AdminLayoutWrapper>} />
-          <Route path="/admin/resources" element={<AdminLayoutWrapper><AdminResources /></AdminLayoutWrapper>} />
-          <Route path="/admin/check-in" element={<AdminLayoutWrapper><AdminQrCheckInPage /></AdminLayoutWrapper>} />
-          <Route path="/admin/bookings" element={<AdminLayoutWrapper><AdminBookingRequests /></AdminLayoutWrapper>} />
-          <Route path="/admin/resources/:id" element={<AdminLayoutWrapper><AdminResourceDetails /></AdminLayoutWrapper>} />
-          <Route path="/admin/resources/add" element={<AdminLayoutWrapper><AddResourceAdmin /></AdminLayoutWrapper>} />
-          <Route path="/admin/tickets" element={<AdminLayoutWrapper><AdminTicketsPage /></AdminLayoutWrapper>} />
+          <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AdminDashboard /></AdminLayoutWrapper></ProtectedRoute>} />
+          <Route path="/admin/resources" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AdminResources /></AdminLayoutWrapper></ProtectedRoute>} />
+          <Route path="/admin/check-in" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AdminQrCheckInPage /></AdminLayoutWrapper></ProtectedRoute>} />
+          <Route path="/admin/bookings" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AdminBookingRequests /></AdminLayoutWrapper></ProtectedRoute>} />
+          <Route path="/admin/resources/:id" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AdminResourceDetails /></AdminLayoutWrapper></ProtectedRoute>} />
+          <Route path="/admin/resources/add" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AddResourceAdmin /></AdminLayoutWrapper></ProtectedRoute>} />
+          <Route path="/admin/tickets" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AdminTicketsPage /></AdminLayoutWrapper></ProtectedRoute>} />
           
           
           {/* Test Routes */}

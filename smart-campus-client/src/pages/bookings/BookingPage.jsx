@@ -3,6 +3,7 @@ import { Alert, Badge, Button, Card, Col, Container, Form, Modal, Row, Spinner }
 import { useLocation } from 'react-router-dom';
 import bookingApi from '../../api/bookingApi';
 import resourceApi from '../../api/resourceApi';
+import { useAuth } from '../../context/AuthContext';
 import './BookingPage.css';
 
 const STATUS_VARIANTS = {
@@ -26,6 +27,7 @@ const EMPTY_FORM = {
 
 const BookingPage = () => {
   const location = useLocation();
+  const { isAuthenticated, hasRole } = useAuth();
   const [resources, setResources] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [filters, setFilters] = useState({
@@ -63,6 +65,8 @@ const BookingPage = () => {
     () => activeResources.find((resource) => resource.id === formData.resourceId) || null,
     [activeResources, formData.resourceId]
   );
+
+  const canManageBookings = isAuthenticated && hasRole(['ADMIN', 'TECHNICIAN']);
 
   const qrPreviewUrl = useMemo(() => {
     if (!activeQrBooking?.qrToken) {
@@ -257,6 +261,16 @@ const BookingPage = () => {
     setFeedback({ type: '', message: '' });
     setValidationErrors({});
 
+    if (!isAuthenticated) {
+      window.alert('Please log in first');
+      setFeedback({
+        type: 'warning',
+        message: 'Please log in first'
+      });
+      setSubmitting(false);
+      return;
+    }
+
     const clientErrors = validateClientForm();
     if (Object.keys(clientErrors).length > 0) {
       setValidationErrors(clientErrors);
@@ -312,6 +326,15 @@ const BookingPage = () => {
   };
 
   const handleStatusUpdate = async (bookingId, status) => {
+    if (!canManageBookings) {
+      window.alert('Please log in first');
+      setFeedback({
+        type: 'warning',
+        message: 'Please log in first'
+      });
+      return;
+    }
+
     try {
       await bookingApi.updateBookingStatus(bookingId, status);
       await refreshBookings();
@@ -330,6 +353,15 @@ const BookingPage = () => {
   };
 
   const handleDelete = async (bookingId) => {
+    if (!canManageBookings) {
+      window.alert('Please log in first');
+      setFeedback({
+        type: 'warning',
+        message: 'Please log in first'
+      });
+      return;
+    }
+
     try {
       await bookingApi.deleteBooking(bookingId);
       await refreshBookings();
@@ -348,6 +380,15 @@ const BookingPage = () => {
   };
 
   const handleIssueQr = async (bookingId) => {
+    if (!canManageBookings) {
+      window.alert('Please log in first');
+      setFeedback({
+        type: 'warning',
+        message: 'Please log in first'
+      });
+      return;
+    }
+
     try {
       setQrBusyId(bookingId);
       const updatedBooking = await bookingApi.issueBookingQr(bookingId);
@@ -729,7 +770,7 @@ const BookingPage = () => {
                           </div>
 
                           <div className="booking-list-actions">
-                            {booking.status === 'PENDING' && (
+                            {canManageBookings && booking.status === 'PENDING' && (
                               <>
                                 <Button
                                   size="sm"
@@ -748,7 +789,7 @@ const BookingPage = () => {
                               </>
                             )}
 
-                            {(booking.status === 'PENDING' || booking.status === 'APPROVED') && (
+                            {canManageBookings && (booking.status === 'PENDING' || booking.status === 'APPROVED') && (
                               <>
                                 <Button
                                   size="sm"
@@ -767,7 +808,7 @@ const BookingPage = () => {
                               </>
                             )}
 
-                            {booking.status === 'APPROVED' && !booking.checkedInAt && (
+                            {canManageBookings && booking.status === 'APPROVED' && !booking.checkedInAt && (
                               <Button
                                 size="sm"
                                 variant="outline-success"
@@ -778,7 +819,7 @@ const BookingPage = () => {
                               </Button>
                             )}
 
-                            {booking.status === 'APPROVED' && booking.qrToken && !booking.checkedInAt && (
+                            {canManageBookings && booking.status === 'APPROVED' && booking.qrToken && !booking.checkedInAt && (
                               <Button
                                 size="sm"
                                 variant="outline-dark"
@@ -788,7 +829,7 @@ const BookingPage = () => {
                               </Button>
                             )}
 
-                            {(booking.status === 'REJECTED' || booking.status === 'CANCELLED') && (
+                            {canManageBookings && (booking.status === 'REJECTED' || booking.status === 'CANCELLED') && (
                               <Button
                                 size="sm"
                                 variant="outline-dark"

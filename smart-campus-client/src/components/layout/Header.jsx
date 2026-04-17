@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
+import { useAuth } from '../../context/AuthContext';
 import './Header.css';
 
 const Header = ({ isAdmin = false }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { logout, isAuthenticated, hasRole } = useAuth();
 
   const handleSmoothScroll = (e) => {
     const href = e.currentTarget.getAttribute('href');
@@ -21,10 +23,12 @@ const Header = ({ isAdmin = false }) => {
     }
   };
 
-  const handleLogout = () => {
-    // Add logout logic here
+  const handleLogout = async () => {
+    await logout();
     navigate('/');
   };
+
+  const showAdminLinks = isAdmin || hasRole(['ADMIN', 'TECHNICIAN']);
 
   return (
     <nav className="sc-navbar">
@@ -53,14 +57,14 @@ const Header = ({ isAdmin = false }) => {
             <a href="#testimonial" className="smoothScroll" onClick={handleSmoothScroll}>Reviews</a>
             <a href="#contact" className="smoothScroll" onClick={handleSmoothScroll}>Contact</a>
             
-            {isAdmin ? (
+            {isAuthenticated ? (
               <>
-                <Link to="/admin/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
-                <Link to="/admin/resources" onClick={() => setMenuOpen(false)}>Manage</Link>
+                {showAdminLinks && <Link to="/admin/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>}
+                {showAdminLinks && <Link to="/admin/resources" onClick={() => setMenuOpen(false)}>Manage</Link>}
                 <a href="#/" onClick={(e) => { e.preventDefault(); handleLogout(); setMenuOpen(false); }}>Logout</a>
               </>
             ) : (
-              <Link to="/admin/login" onClick={() => setMenuOpen(false)} className="sc-nav-phone">Admin Login</Link>
+              <Link to="/#login" onClick={() => setMenuOpen(false)} className="sc-nav-phone">Log In</Link>
             )}
           </div>
         </div>

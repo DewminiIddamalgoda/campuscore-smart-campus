@@ -1,11 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Container, Row, Col } from 'react-bootstrap';
+import { useAuth } from '../../context/AuthContext';
 import './HomePage.css';
 
 const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loginForm, setLoginForm] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+  });
+  const [loginState, setLoginState] = useState({
+    loading: false,
+    error: '',
+  });
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const slides = [
     {
@@ -223,6 +236,15 @@ const HomePage = () => {
   }, [slides.length]);
 
   useEffect(() => {
+    const shouldScrollToLogin = location.state?.scrollToLogin || location.hash === '#login';
+    if (shouldScrollToLogin) {
+      window.requestAnimationFrame(() => {
+        document.getElementById('login')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }, [location.hash, location.state]);
+
+  useEffect(() => {
     const handleSmoothScroll = (e) => {
       const href = e.currentTarget.getAttribute('href');
       if (!href || !href.startsWith('#')) return;
@@ -248,6 +270,38 @@ const HomePage = () => {
       });
     };
   }, []);
+
+  const handleLoginChange = (event) => {
+    const { name, value } = event.target;
+    setLoginForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  const handleLoginSubmit = async (event) => {
+    event.preventDefault();
+    setLoginState({ loading: true, error: '' });
+
+    try {
+      const response = await login(loginForm);
+      navigate(response.redirectPath || '/', { replace: true });
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.details ||
+        'Unable to log in right now.';
+
+      window.alert(errorMessage);
+      setLoginState({
+        loading: false,
+        error: errorMessage,
+      });
+      return;
+    }
+
+    setLoginState({ loading: false, error: '' });
+  };
 
   const goToNextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -423,21 +477,59 @@ const HomePage = () => {
             </Col>
 
             <Col lg={5} md={12}>
-              <div className="modern-card login-card">
+              <div className="modern-card login-card" id="login">
                 <h3>Login to Dashboard</h3>
                 <p>Access your campus system account securely.</p>
 
-                <form>
-                  <input type="text" className="modern-input" placeholder="Full name" required />
-                  <input type="email" className="modern-input" placeholder="University email" required />
-                  <input type="password" className="modern-input" placeholder="Password" required />
-                  <Button className="w-100 modern-btn" variant="primary">
-                    Sign In
+                {location.state?.authMessage && (
+                  <div className="login-inline-alert">
+                    {location.state.authMessage}
+                  </div>
+                )}
+
+                {loginState.error && (
+                  <div className="login-inline-alert danger">
+                    {loginState.error}
+                  </div>
+                )}
+
+                <form onSubmit={handleLoginSubmit}>
+                  <input
+                    type="text"
+                    className="modern-input"
+                    placeholder="Full name"
+                    name="fullName"
+                    value={loginForm.fullName}
+                    onChange={handleLoginChange}
+                    required
+                  />
+                  <input
+                    type="email"
+                    className="modern-input"
+                    placeholder="University email"
+                    name="email"
+                    value={loginForm.email}
+                    onChange={handleLoginChange}
+                    required
+                  />
+                  <input
+                    type="password"
+                    className="modern-input"
+                    placeholder="Password"
+                    name="password"
+                    value={loginForm.password}
+                    onChange={handleLoginChange}
+                    required
+                  />
+                  <Button className="w-100 modern-btn" variant="primary" type="submit" disabled={loginState.loading}>
+                    {loginState.loading ? 'Logging In...' : 'Log In'}
                   </Button>
                 </form>
 
                 <div className="login-note">
-                  OAuth login can be connected here later.
+                  <Link to="/register" className="login-register-link">
+                    Don&apos;t have an account? Register here
+                  </Link>
                 </div>
               </div>
             </Col>

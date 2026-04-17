@@ -536,6 +536,32 @@ p {
   font-size: 13px;
 }
 
+.login-inline-alert {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #1d4ed8;
+  border: 1px solid rgba(59, 130, 246, 0.18);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.login-inline-alert.danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #b91c1c;
+  border-color: rgba(239, 68, 68, 0.18);
+}
+
+.login-register-link {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.login-register-link:hover {
+  color: var(--secondary);
+}
+
 /* RESOURCES */
 .resource-card {
   overflow: hidden;
