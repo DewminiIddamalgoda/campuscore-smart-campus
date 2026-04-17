@@ -1,9 +1,11 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const ResourceCard = ({ resource }) => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const getSuitabilityBadgeClass = (badge) => {
     if (badge.includes('Best for')) return 'suitability-badge suitability-best';
@@ -32,12 +34,17 @@ const ResourceCard = ({ resource }) => {
     navigate(`/resources/${resource.id}`);
   };
 
-    const handleBooking = () => {
-      console.log('Booking clicked for resource:', resource.id);
-      console.log('Navigating to:', `/bookings?resourceId=${resource.id}`);
-      navigate(`/bookings?resourceId=${encodeURIComponent(resource.id)}`, {
-        state: { selectedResourceId: resource.id }
-      });
+  const handleBooking = () => {
+    if (!isAuthenticated) {
+      window.alert('Please log in first');
+      return;
+    }
+
+    console.log('Booking clicked for resource:', resource.id);
+    console.log('Navigating to:', `/bookings?resourceId=${resource.id}`);
+    navigate(`/bookings?resourceId=${encodeURIComponent(resource.id)}`, {
+      state: { selectedResourceId: resource.id }
+    });
     };
 
   return (

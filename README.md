@@ -114,6 +114,27 @@ npm run dev
 ```
 The UI will be available at `http://localhost:3000`
 
+### Google OAuth Setup
+To enable Google sign-in locally:
+1. Create a Web OAuth client in Google Cloud Console.
+2. Add this authorized JavaScript origin:
+   ```text
+   http://localhost:3000
+   ```
+3. Add this authorized redirect URI:
+   ```text
+   http://localhost:8080/login/oauth2/code/google
+   ```
+4. Set these environment variables before starting the backend:
+   ```text
+   GOOGLE_CLIENT_ID=your-client-id
+   GOOGLE_CLIENT_SECRET=your-client-secret
+   APP_OAUTH_FRONTEND_URL=http://localhost:3000
+   ```
+5. Keep the frontend running on `http://localhost:3000`.
+
+If Google OAuth is not configured, the app will still run normally and hide the Google sign-in button.
+
 ## Sample Data
 The system includes 10 sample resources with various types and configurations:
 - Lecture halls (150-300 capacity)

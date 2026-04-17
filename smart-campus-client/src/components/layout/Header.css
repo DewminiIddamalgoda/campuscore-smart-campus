@@ -66,6 +66,21 @@
   text-decoration: none;
 }
 
+.sc-user-name {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
 .sc-nav-phone {
   padding: 11px 16px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(240, 240, 240, 0.22));
