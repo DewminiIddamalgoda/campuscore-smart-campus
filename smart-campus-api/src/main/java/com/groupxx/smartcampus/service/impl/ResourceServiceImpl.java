@@ -8,6 +8,7 @@ import com.groupxx.smartcampus.enums.ResourceStatus;
 import com.groupxx.smartcampus.enums.ResourceType;
 import com.groupxx.smartcampus.exception.ResourceNotFoundException;
 import com.groupxx.smartcampus.repository.ResourceRepository;
+import com.groupxx.smartcampus.service.NotificationService;
 import com.groupxx.smartcampus.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Autowired
     private ResourceRepository resourceRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public ResourceResponseDto createResource(ResourceRequestDto resourceDto) {
@@ -47,8 +51,18 @@ public class ResourceServiceImpl implements ResourceService {
         Resource existingResource = resourceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
 
+        boolean wasOutOfService = existingResource.getStatus() == ResourceStatus.OUT_OF_SERVICE;
+        boolean becomingActive = resourceDto.getStatus() == ResourceStatus.ACTIVE;
+
         updateEntityFromDto(existingResource, resourceDto);
         Resource updatedResource = resourceRepository.save(existingResource);
+
+        if (wasOutOfService && becomingActive) {
+            notificationService.createSystemNotification("RESOURCE_AVAILABLE",
+                    updatedResource.getName() + " is now available for bookings.",
+                    updatedResource.getId(), updatedResource.getName());
+        }
+
         return convertToResponseDto(updatedResource);
     }
 

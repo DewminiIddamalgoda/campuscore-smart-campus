@@ -3,7 +3,9 @@ import { Container, Row, Col, Button, Card, Badge } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import bookingApi from '../../api/bookingApi';
 import resourceApi from '../../api/resourceApi';
+import notificationApi from '../../api/notificationApi';
 import { Link } from 'react-router-dom';
+import { FaBell } from 'react-icons/fa';
 
 const STATUS_BADGE = {
   PENDING: 'warning',
@@ -24,6 +26,7 @@ const UserProfile = () => {
   const [bookings, setBookings] = useState([]);
   const [resourcesById, setResourcesById] = useState({});
   const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const load = async () => {
@@ -53,6 +56,16 @@ const UserProfile = () => {
       } finally {
         setLoading(false);
       }
+
+      try {
+        const token = localStorage.getItem('campuscore_auth_token');
+        if (token) {
+          const count = await notificationApi.getUnreadCount(token);
+          setUnreadCount(count || 0);
+        }
+      } catch (e) {
+        // ignore
+      }
     };
 
     load();
@@ -69,6 +82,15 @@ const UserProfile = () => {
 
               <div className="d-flex align-items-center gap-2 mb-4">
                 <Link to="/profile/edit" className="btn btn-primary" style={{ color: '#fff' }}>Edit Profile</Link>
+                <Link to="/profile/notifications" className="btn btn-outline-secondary position-relative">
+                  <FaBell />
+                  {unreadCount > 0 && (
+                    <Badge pill bg="danger" className="position-absolute top-0 start-100 translate-middle">
+                      {unreadCount}
+                    </Badge>
+                  )}
+                  {' '}Notifications
+                </Link>
               </div>
 
               <hr />
