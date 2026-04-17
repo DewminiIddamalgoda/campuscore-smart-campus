@@ -40,7 +40,7 @@ public class TicketControllerTest {
     public void testCreateTicket() throws Exception {
         Ticket ticket = new Ticket();
         ticket.setId("t1");
-        ticket.setTitle("AC not working");
+        ticket.setTitle("AC not working..");
 
         when(ticketService.createTicket(any(Ticket.class))).thenReturn(ticket);
 
