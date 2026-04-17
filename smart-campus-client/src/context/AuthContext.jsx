@@ -151,6 +151,7 @@ export const AuthProvider = ({ children }) => {
     registerStudent,
     registerAdmin,
     registerTechnician,
+    applySession: saveSession,
     logout,
     clearSession,
     hasRole,

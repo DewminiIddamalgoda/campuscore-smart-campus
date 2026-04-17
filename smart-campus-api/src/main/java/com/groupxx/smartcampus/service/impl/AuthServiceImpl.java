@@ -89,6 +89,19 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public AuthResponseDto loginWithOAuth(String email, String fullName, String firstName, String lastName) {
+        String normalizedEmail = normalizeEmail(email);
+        if (normalizedEmail == null || normalizedEmail.isBlank()) {
+            throw new AuthException(HttpStatus.BAD_REQUEST, "OAuth account does not contain an email address");
+        }
+
+        AppUser user = userRepository.findByEmailIgnoreCase(normalizedEmail)
+                .orElseGet(() -> provisionOAuthStudent(normalizedEmail, fullName, firstName, lastName));
+
+        return issueSession(user, "Login successful via Google");
+    }
+
+    @Override
     public UserProfileDto getCurrentUser(String token) {
         AuthSession session = resolveActiveSession(token);
         AppUser user = userRepository.findByEmailIgnoreCase(session.getEmail())
@@ -286,5 +299,50 @@ public class AuthServiceImpl implements AuthService {
             return "/";
         }
         return "/admin/dashboard";
+    }
+
+    private AppUser provisionOAuthStudent(String email, String fullName, String firstName, String lastName) {
+        AppUser user = new AppUser();
+        user.setFirstName(normalizeNameOrFallback(firstName, fullName, email));
+        user.setLastName(normalizeNameOrFallback(lastName, "", ""));
+
+        String resolvedFullName = buildFullName(
+                normalizeNameOrFallback(firstName, fullName, email),
+                normalizeNameOrFallback(lastName, "", "")
+        ).trim();
+        user.setFullName(resolvedFullName.isBlank() ? email : resolvedFullName);
+        user.setEmail(email);
+        user.setContactNumber(generateUniqueContactNumber());
+        user.setRole(UserRole.STUDENT);
+        user.setFaculty(Faculty.COMPUTING);
+        user.setAcademicYear("Not provided");
+        user.setUserId(generateUniqueUserId("IT"));
+        user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+        return userRepository.save(user);
+    }
+
+    private String normalizeNameOrFallback(String primary, String secondary, String tertiary) {
+        if (primary != null && !primary.isBlank()) {
+            return normalizeName(primary);
+        }
+        if (secondary != null && !secondary.isBlank()) {
+            return normalizeName(secondary);
+        }
+        if (tertiary != null && !tertiary.isBlank()) {
+            return normalizeName(tertiary.split("@")[0].replace('.', ' '));
+        }
+        return "";
+    }
+
+    private String generateUniqueContactNumber() {
+        for (int attempt = 0; attempt < 1000; attempt++) {
+            String candidate = "07" + String.format("%08d", (int) (Math.random() * 100_000_000));
+            if (!userRepository.existsByContactNumber(candidate)) {
+                return candidate;
+            }
+        }
+        throw new AuthException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to generate contact number");
     }
 }

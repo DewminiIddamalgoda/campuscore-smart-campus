@@ -17,6 +17,8 @@ public interface AuthService {
 
     AuthResponseDto login(LoginRequestDto request);
 
+    AuthResponseDto loginWithOAuth(String email, String fullName, String firstName, String lastName);
+
     UserProfileDto getCurrentUser(String token);
 
     void logout(String token);

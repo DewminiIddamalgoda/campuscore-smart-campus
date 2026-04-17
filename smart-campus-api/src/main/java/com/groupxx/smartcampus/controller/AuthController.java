@@ -53,4 +53,16 @@ public class AuthController {
         authService.logout(authorization);
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
+
+    @GetMapping("/oauth/google/enabled")
+    public ResponseEntity<Map<String, Boolean>> googleOAuthEnabled() {
+        boolean enabled = isGoogleOAuthEnabled();
+        return ResponseEntity.ok(Map.of("enabled", enabled));
+    }
+
+    private boolean isGoogleOAuthEnabled() {
+        String clientId = System.getenv("GOOGLE_CLIENT_ID");
+        String clientSecret = System.getenv("GOOGLE_CLIENT_SECRET");
+        return clientId != null && !clientId.isBlank() && clientSecret != null && !clientSecret.isBlank();
+    }
 }

@@ -16,9 +16,11 @@ const HomePage = () => {
     loading: false,
     error: '',
   });
+  const [googleOAuthEnabled, setGoogleOAuthEnabled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, applySession } = useAuth();
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
   const slides = [
     {
@@ -245,6 +247,32 @@ const HomePage = () => {
   }, [location.hash, location.state]);
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+    const userId = params.get('userId');
+    const fullName = params.get('fullName');
+    const email = params.get('email');
+    const role = params.get('role');
+    const redirectPath = params.get('redirectPath') || '/';
+
+    if (!token || !email) {
+      return;
+    }
+
+    applySession({
+      token,
+      userId,
+      fullName,
+      email,
+      role,
+      redirectPath,
+    });
+
+    const cleanPath = redirectPath === '/admin/dashboard' ? '/admin/dashboard' : redirectPath;
+    navigate(cleanPath, { replace: true });
+  }, [applySession, location.search, navigate]);
+
+  useEffect(() => {
     const handleSmoothScroll = (e) => {
       const href = e.currentTarget.getAttribute('href');
       if (!href || !href.startsWith('#')) return;
@@ -270,6 +298,25 @@ const HomePage = () => {
       });
     };
   }, []);
+
+  useEffect(() => {
+    const loadOAuthAvailability = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/oauth/google/enabled`);
+        if (!response.ok) {
+          setGoogleOAuthEnabled(false);
+          return;
+        }
+
+        const data = await response.json();
+        setGoogleOAuthEnabled(Boolean(data?.enabled));
+      } catch {
+        setGoogleOAuthEnabled(false);
+      }
+    };
+
+    loadOAuthAvailability();
+  }, [API_BASE_URL]);
 
   const handleLoginChange = (event) => {
     const { name, value } = event.target;
@@ -525,6 +572,19 @@ const HomePage = () => {
                     {loginState.loading ? 'Logging In...' : 'Log In'}
                   </Button>
                 </form>
+
+                {googleOAuthEnabled && (
+                  <Button
+                    type="button"
+                    variant="light"
+                    className="w-100 mt-3 oauth-btn"
+                    onClick={() => {
+                      window.location.href = `${API_BASE_URL}/oauth2/authorization/google`;
+                    }}
+                  >
+                    Continue with Google
+                  </Button>
+                )}
 
                 <div className="login-note">
                   <Link to="/register" className="login-register-link">

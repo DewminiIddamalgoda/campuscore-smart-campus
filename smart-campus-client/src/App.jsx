@@ -21,6 +21,7 @@ import TicketsPage from './pages/SupportTicket/TicketsPage';
 import AdminTicketsPage from './pages/admin/AdminTicketsPage';
 import RegistrationSelectionPage from './pages/auth/RegistrationSelectionPage';
 import RegistrationPage from './pages/auth/RegistrationPage';
+import OAuthCallbackPage from './pages/auth/OAuthCallbackPage';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -53,6 +54,7 @@ function App() {
           <Route path="/" element={<UserLayout><HomePage /></UserLayout>} />
           <Route path="/register" element={<UserLayout><RegistrationSelectionPage /></UserLayout>} />
           <Route path="/register/:role" element={<UserLayout><RegistrationPage /></UserLayout>} />
+          <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
           <Route path="/bookings" element={<UserLayout><BookingPage /></UserLayout>} />
           <Route path="/resources" element={<UserLayout><ResourceListPage /></UserLayout>} />
           <Route path="/resources/:id" element={<UserLayout><ResourceDetailsPage /></UserLayout>} />
