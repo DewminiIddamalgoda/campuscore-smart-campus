@@ -12,8 +12,10 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -65,6 +67,12 @@ public class AuthController {
     public ResponseEntity<Map<String, Boolean>> googleOAuthEnabled() {
         boolean enabled = isGoogleOAuthEnabled();
         return ResponseEntity.ok(Map.of("enabled", enabled));
+    }
+
+    @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserProfileDto>> getAllUsers() {
+        return ResponseEntity.ok(authService.getAllUsers());
     }
 
     private boolean isGoogleOAuthEnabled() {
