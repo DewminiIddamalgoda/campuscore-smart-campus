@@ -8,6 +8,8 @@ import com.groupxx.smartcampus.dto.auth.TechnicianRegistrationRequestDto;
 import com.groupxx.smartcampus.dto.auth.UserProfileDto;
 import com.groupxx.smartcampus.dto.auth.UpdateProfileRequestDto;
 
+import java.util.List;
+
 public interface AuthService {
 
     AuthResponseDto registerStudent(StudentRegistrationRequestDto request);
@@ -25,4 +27,6 @@ public interface AuthService {
     UserProfileDto updateProfile(String token, UpdateProfileRequestDto request);
 
     void logout(String token);
+
+    List<UserProfileDto> getAllUsers();
 }
