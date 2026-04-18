@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.groupxx.smartcampus.entity.Ticket;
 import com.groupxx.smartcampus.enums.TicketStatus;
 import com.groupxx.smartcampus.service.TicketService;
+import com.groupxx.smartcampus.service.AuthService;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,27 +31,32 @@ public class TicketControllerTest {
         @MockBean
         private TicketService ticketService;
 
+        // 🔥 IMPORTANT: mock missing dependency (fixes ApplicationContext error)
+        @MockBean
+        private AuthService authService;
+
         @Autowired
         private ObjectMapper objectMapper;
 
+        // ✅ CREATE TICKET
         @Test
         public void testCreateTicket() throws Exception {
                 Ticket ticket = new Ticket();
                 ticket.setId("t1");
                 ticket.setTitle("AC not working");
 
-                // 🔥 FIX: mock with token + ticket
                 when(ticketService.createTicket(anyString(), any(Ticket.class)))
                                 .thenReturn(ticket);
 
                 mockMvc.perform(post("/tickets")
-                                .header("Authorization", "Bearer test-token") // 🔥 required
+                                .header("Authorization", "Bearer test-token") // required now
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(ticket)))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.title").value("AC not working"));
         }
 
+        // ✅ GET ALL TICKETS
         @Test
         public void testGetAllTickets() throws Exception {
                 Ticket ticket = new Ticket();
@@ -63,6 +69,7 @@ public class TicketControllerTest {
                                 .andExpect(status().isOk());
         }
 
+        // ✅ GET BY ID
         @Test
         public void testGetTicketById() throws Exception {
                 Ticket ticket = new Ticket();
@@ -75,6 +82,7 @@ public class TicketControllerTest {
                                 .andExpect(jsonPath("$.id").value("t1"));
         }
 
+        // ✅ UPDATE STATUS
         @Test
         public void testUpdateStatus() throws Exception {
                 Ticket ticket = new Ticket();
@@ -89,6 +97,7 @@ public class TicketControllerTest {
                                 .andExpect(status().isOk());
         }
 
+        // ✅ DELETE
         @Test
         public void testDeleteTicket() throws Exception {
                 doNothing().when(ticketService).deleteTicket("t1");
