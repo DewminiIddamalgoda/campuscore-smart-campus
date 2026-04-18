@@ -15,41 +15,39 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
-    // 1. Add Comment
+    // 🔥 Add Comment (with token)
     @PostMapping
     public Comment addComment(
+            @RequestHeader("Authorization") String token,
             @PathVariable String ticketId,
             @RequestBody Comment comment) {
 
-        comment.setTicketId(ticketId);
-        return commentService.addComment(comment);
+        return commentService.addComment(token, ticketId, comment);
     }
 
-    // 2. Get All Comments for a Ticket
+    // Get Comments
     @GetMapping
     public List<Comment> getComments(@PathVariable String ticketId) {
         return commentService.getCommentsByTicket(ticketId);
     }
 
-    // 3. Update Comment (only owner)
+    // 🔥 Update Comment (secure)
     @PutMapping("/{commentId}")
     public Comment updateComment(
-            @PathVariable String ticketId,
+            @RequestHeader("Authorization") String token,
             @PathVariable String commentId,
-            @RequestParam String userId,
             @RequestParam String message) {
 
-        return commentService.updateComment(commentId, userId, message);
+        return commentService.updateComment(token, commentId, message);
     }
 
-    // 4. Delete Comment (only owner)
+    // 🔥 Delete Comment (secure)
     @DeleteMapping("/{commentId}")
     public String deleteComment(
-            @PathVariable String ticketId,
-            @PathVariable String commentId,
-            @RequestParam String userId) {
+            @RequestHeader("Authorization") String token,
+            @PathVariable String commentId) {
 
-        commentService.deleteComment(commentId, userId);
+        commentService.deleteComment(token, commentId);
         return "Comment deleted successfully";
     }
 }
