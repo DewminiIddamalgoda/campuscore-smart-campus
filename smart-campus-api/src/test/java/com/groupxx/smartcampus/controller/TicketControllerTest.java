@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -21,7 +23,10 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(TicketController.class)
+@WebMvcTest(controllers = TicketController.class, excludeFilters = {
+                // 🚫 EXCLUDE SECURITY FILTER (THIS FIXES YOUR ERROR)
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = com.groupxx.smartcampus.security.BearerTokenAuthenticationFilter.class)
+})
 @AutoConfigureMockMvc(addFilters = false)
 public class TicketControllerTest {
 
@@ -31,14 +36,16 @@ public class TicketControllerTest {
         @MockBean
         private TicketService ticketService;
 
-        // 🔥 IMPORTANT: mock missing dependency (fixes ApplicationContext error)
+        // 🔥 REQUIRED (because your service uses it internally)
         @MockBean
         private AuthService authService;
 
         @Autowired
         private ObjectMapper objectMapper;
 
-        // ✅ CREATE TICKET
+        // =============================
+        // CREATE TICKET
+        // =============================
         @Test
         public void testCreateTicket() throws Exception {
                 Ticket ticket = new Ticket();
@@ -49,14 +56,16 @@ public class TicketControllerTest {
                                 .thenReturn(ticket);
 
                 mockMvc.perform(post("/tickets")
-                                .header("Authorization", "Bearer test-token") // required now
+                                .header("Authorization", "Bearer test-token")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(ticket)))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.title").value("AC not working"));
         }
 
-        // ✅ GET ALL TICKETS
+        // =============================
+        // GET ALL TICKETS
+        // =============================
         @Test
         public void testGetAllTickets() throws Exception {
                 Ticket ticket = new Ticket();
@@ -69,7 +78,9 @@ public class TicketControllerTest {
                                 .andExpect(status().isOk());
         }
 
-        // ✅ GET BY ID
+        // =============================
+        // GET BY ID
+        // =============================
         @Test
         public void testGetTicketById() throws Exception {
                 Ticket ticket = new Ticket();
@@ -82,7 +93,9 @@ public class TicketControllerTest {
                                 .andExpect(jsonPath("$.id").value("t1"));
         }
 
-        // ✅ UPDATE STATUS
+        // =============================
+        // UPDATE STATUS
+        // =============================
         @Test
         public void testUpdateStatus() throws Exception {
                 Ticket ticket = new Ticket();
@@ -97,7 +110,9 @@ public class TicketControllerTest {
                                 .andExpect(status().isOk());
         }
 
-        // ✅ DELETE
+        // =============================
+        // DELETE
+        // =============================
         @Test
         public void testDeleteTicket() throws Exception {
                 doNothing().when(ticketService).deleteTicket("t1");
