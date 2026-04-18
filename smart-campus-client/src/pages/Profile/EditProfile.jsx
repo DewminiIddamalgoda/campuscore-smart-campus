@@ -67,18 +67,22 @@ const EditProfile = () => {
 
   return (
     <div className="edit-profile-page">
-      <Container>
+      <Container fluid>
+        {/* Header Section */}
+        <div className="section-header mb-5">
+          <span className="section-label">Profile Settings</span>
+          <h1 className="section-title">
+            Edit Profile
+          </h1>
+          <p className="section-description">
+            Update your contact number and password with a polished, secure form built for campus users.
+          </p>
+        </div>
+
         <div className="profile-panel">
           <Row>
             <Col md={8} className="mx-auto">
-              <div className="profile-card p-4 p-md-5">
-                <div className="profile-header">
-                  <div>
-                    <h2>Edit Profile</h2>
-                    <p className="profile-subtitle">Update your contact number and password with a refreshed, secure form.</p>
-                  </div>
-                </div>
-
+              <div className="profile-card">
                 {error && <Alert variant="danger">{error}</Alert>}
 
                 <Form onSubmit={handleSubmit}>

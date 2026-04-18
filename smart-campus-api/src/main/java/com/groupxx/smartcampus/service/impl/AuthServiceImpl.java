@@ -23,7 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -367,5 +369,12 @@ public class AuthServiceImpl implements AuthService {
             return 2;
         }
         return 1;
+    }
+
+    @Override
+    public List<UserProfileDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(this::toProfileDto)
+                .collect(Collectors.toList());
     }
 }
