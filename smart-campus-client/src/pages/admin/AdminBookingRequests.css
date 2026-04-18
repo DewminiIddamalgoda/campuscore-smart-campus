@@ -1,22 +1,22 @@
 .admin-booking-requests {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   padding-bottom: 2rem;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
 }
 
 .admin-booking-requests h2 {
-  color: white;
   font-weight: 700;
   letter-spacing: -0.025em;
 }
 
 .admin-booking-requests .text-muted {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(75, 85, 99, 0.8);
 }
 
 .admin-booking-requests .card {
-  border-radius: 1rem;
+  border-radius: 1.25rem;
   overflow: hidden;
+  border: 0;
 }
 
 .admin-booking-requests .card-body {

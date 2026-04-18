@@ -28,7 +28,7 @@ import resourceApi from '../../api/resourceApi';
 
 const styles = `
   .admin-resources {
-    background: #f8fafc;
+    background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
     min-height: 100vh;
   }
 
@@ -180,7 +180,7 @@ const styles = `
   }
 
   .admin-resources table thead th {
-    color: #0f172a !important;
+    color: #ffffff !important;
     font-weight: 700;
     border-bottom: none;
   }
@@ -244,8 +244,7 @@ const AdminResources = () => {
 
   const statusOptions = [
     { value: 'ACTIVE', label: 'Active', variant: 'success' },
-    { value: 'OUT_OF_SERVICE', label: 'Out of Service', variant: 'danger' },
-    { value: 'UNDER_MAINTENANCE', label: 'Under Maintenance', variant: 'warning' }
+    { value: 'OUT_OF_SERVICE', label: 'Out of Service', variant: 'danger' }
   ];
 
   useEffect(() => {
@@ -284,7 +283,7 @@ const AdminResources = () => {
         type: resource.type || 'LECTURE_HALL',
         capacity: resource.capacity || '',
         location: resource.location || '',
-        status: resource.status || 'ACTIVE',
+        status: resource.status === 'UNDER_MAINTENANCE' ? 'OUT_OF_SERVICE' : (resource.status || 'ACTIVE'),
         availableFrom: resource.availableFrom || '',
         availableTo: resource.availableTo || '',
         description: resource.description || ''
@@ -377,14 +376,14 @@ const AdminResources = () => {
 
   const totalResources = resources.length;
   const activeResources = resources.filter((resource) => resource.status === 'ACTIVE').length;
-  const maintenanceResources = resources.filter((resource) => resource.status === 'UNDER_MAINTENANCE').length;
   const outOfServiceResources = resources.filter((resource) => resource.status === 'OUT_OF_SERVICE').length;
 
   const getStatusBadge = (status) => {
-    const statusOption = statusOptions.find((s) => s.value === status);
+    const normalizedStatus = status === 'UNDER_MAINTENANCE' ? 'OUT_OF_SERVICE' : status;
+    const statusOption = statusOptions.find((s) => s.value === normalizedStatus);
     return (
       <Badge bg={statusOption?.variant || 'secondary'}>
-        {statusOption?.label || status}
+        {statusOption?.label || normalizedStatus}
       </Badge>
     );
   };
@@ -467,15 +466,6 @@ const AdminResources = () => {
               <div className="summary-body">
                 <div className="summary-value">{activeResources}</div>
                 <div className="summary-label">Ready for booking</div>
-              </div>
-            </Card>
-          </Col>
-          <Col md={3}>
-            <Card className="summary-card">
-              <div className="summary-top">Maintenance</div>
-              <div className="summary-body">
-                <div className="summary-value">{maintenanceResources}</div>
-                <div className="summary-label">Needs attention or repair</div>
               </div>
             </Card>
           </Col>
