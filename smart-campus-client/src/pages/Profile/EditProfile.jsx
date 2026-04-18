@@ -3,6 +3,7 @@ import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import { useToast } from '../../components/common/ToastProvider.jsx';
+import './ProfileStyles.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
@@ -65,41 +66,49 @@ const EditProfile = () => {
   };
 
   return (
-    <div className="edit-profile-page" style={{ paddingTop: '140px', paddingBottom: '140px' }}>
+    <div className="edit-profile-page">
       <Container>
-        <Row>
-          <Col md={8} className="mx-auto">
-            <div className="modern-card p-4 p-md-5">
-              <h2>Edit Profile</h2>
-              {error && <Alert variant="danger">{error}</Alert>}
-
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Contact Number</Form.Label>
-                  <Form.Control name="contactNumber" value={form.contactNumber} onChange={handleChange} placeholder="07XXXXXXXX" maxLength={10} />
-                </Form.Group>
-
-                <hr />
-
-                <Form.Group className="mb-3">
-                  <Form.Label>New Password</Form.Label>
-                  <Form.Control type="password" name="newPassword" value={form.newPassword} onChange={handleChange} />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Confirm New Password</Form.Label>
-                  <Form.Control type="password" name="confirmNewPassword" value={form.confirmNewPassword} onChange={handleChange} />
-                </Form.Group>
-
-                <div className="d-flex gap-2 mt-4">
-                  <Button type="submit" disabled={loading} variant="primary" style={{ color: '#fff' }}>
-                    {loading ? 'Saving...' : 'Save Changes'}
-                  </Button>
+        <div className="profile-panel">
+          <Row>
+            <Col md={8} className="mx-auto">
+              <div className="profile-card p-4 p-md-5">
+                <div className="profile-header">
+                  <div>
+                    <h2>Edit Profile</h2>
+                    <p className="profile-subtitle">Update your contact number and password with a refreshed, secure form.</p>
+                  </div>
                 </div>
-              </Form>
-            </div>
-          </Col>
-        </Row>
+
+                {error && <Alert variant="danger">{error}</Alert>}
+
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Contact Number</Form.Label>
+                    <Form.Control className="modern-input" name="contactNumber" value={form.contactNumber} onChange={handleChange} placeholder="07XXXXXXXX" maxLength={10} />
+                  </Form.Group>
+
+                  <div className="form-section-divider" />
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>New Password</Form.Label>
+                    <Form.Control className="modern-input" type="password" name="newPassword" value={form.newPassword} onChange={handleChange} />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Confirm New Password</Form.Label>
+                    <Form.Control className="modern-input" type="password" name="confirmNewPassword" value={form.confirmNewPassword} onChange={handleChange} />
+                  </Form.Group>
+
+                  <div className="profile-actions mt-4">
+                    <Button type="submit" disabled={loading} className="btn modern-btn">
+                      {loading ? 'Saving...' : 'Save Changes'}
+                    </Button>
+                  </div>
+                </Form>
+              </div>
+            </Col>
+          </Row>
+        </div>
       </Container>
     </div>
   );

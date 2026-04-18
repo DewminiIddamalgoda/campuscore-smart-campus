@@ -5,7 +5,7 @@ import './Footer.css';
 
 const Footer = () => {
   return (
-    <footer id="footer" className="site-footer">
+    <footer id="footer" className="site-footer" style={{ color: '#ffffff' }}>
       <div className="footer-glow footer-glow-1"></div>
       <div className="footer-glow footer-glow-2"></div>
 

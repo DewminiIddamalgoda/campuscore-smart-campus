@@ -153,16 +153,44 @@ const AdminBookingRequests = () => {
   }
 
   return (
-    <div className="admin-booking-requests">
-      <Container fluid className="py-4">
-        <Row className="mb-4">
-          <Col>
-            <h2 className="mb-2">Booking Review Center</h2>
-            <p className="text-muted">
-              Review, approve, or reject booking requests. Manage pending bookings and view history.
-            </p>
-          </Col>
-        </Row>
+    <div
+      className="admin-booking-requests"
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%)'
+      }}
+    >
+      <Container fluid className="py-4 px-3 px-md-4">
+        <Card
+          className="border-0 shadow-sm mb-4"
+          style={{
+            borderRadius: '24px',
+            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            color: '#fff'
+          }}
+        >
+          <Card.Body className="p-4">
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+              <div>
+                <div className="d-flex align-items-center gap-2 mb-2">
+                  <Badge bg="light" text="dark" className="px-3 py-2 rounded-pill">
+                    Admin Panel
+                  </Badge>
+                  <Badge bg="success" className="px-3 py-2 rounded-pill">
+                    Live Data
+                  </Badge>
+                </div>
+                <h2 className="fw-bold mb-2 text-white">Booking Review Center</h2>
+                <p className="mb-0 text-light opacity-75">
+                  Review, approve, or reject booking requests. Manage pending bookings and view history.
+                </p>
+              </div>
+              <div className="text-md-end">
+                <div className="small opacity-75">Connected to bookings backend</div>
+              </div>
+            </div>
+          </Card.Body>
+        </Card>
 
         {error && (
           <Alert variant="danger" dismissible onClose={() => setError('')}>

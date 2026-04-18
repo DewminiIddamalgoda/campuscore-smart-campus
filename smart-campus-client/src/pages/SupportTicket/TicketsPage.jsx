@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  getTickets,
+  getMyTickets,
   createTicket,
   uploadImages
 } from "../../api/ticketService";
@@ -61,7 +61,7 @@ const TicketsPage = () => {
 
   const loadTickets = async () => {
     try {
-      const res = await getTickets();
+      const res = await getMyTickets();
       setTickets(res.data);
     } catch {
       // fallback demo data
@@ -105,7 +105,7 @@ const TicketsPage = () => {
     if (!form.title || !form.description) return;
     setSubmitting(true);
     try {
-      const res = await createTicket({ ...form, userId: "user1" });
+      const res = await createTicket(form);
       const ticketId = res.data.id;
       if (files.length > 0) await uploadImages(ticketId, files);
     } catch {
