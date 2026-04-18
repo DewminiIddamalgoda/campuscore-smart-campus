@@ -4,15 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.groupxx.smartcampus.entity.Ticket;
 import com.groupxx.smartcampus.enums.TicketStatus;
 import com.groupxx.smartcampus.service.TicketService;
-import com.groupxx.smartcampus.service.AuthService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,12 +20,9 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = TicketController.class, excludeFilters = {
-                // 🚫 EXCLUDE SECURITY FILTER (THIS FIXES YOUR ERROR)
-                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = com.groupxx.smartcampus.security.BearerTokenAuthenticationFilter.class)
-})
+@WebMvcTest(TicketController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class TicketControllerTest {
+class TicketControllerTest {
 
         @Autowired
         private MockMvc mockMvc;
@@ -36,18 +30,11 @@ public class TicketControllerTest {
         @MockBean
         private TicketService ticketService;
 
-        // 🔥 REQUIRED (because your service uses it internally)
-        @MockBean
-        private AuthService authService;
-
         @Autowired
         private ObjectMapper objectMapper;
 
-        // =============================
-        // CREATE TICKET
-        // =============================
         @Test
-        public void testCreateTicket() throws Exception {
+        void testCreateTicket() throws Exception {
                 Ticket ticket = new Ticket();
                 ticket.setId("t1");
                 ticket.setTitle("AC not working");
@@ -63,26 +50,17 @@ public class TicketControllerTest {
                                 .andExpect(jsonPath("$.title").value("AC not working"));
         }
 
-        // =============================
-        // GET ALL TICKETS
-        // =============================
         @Test
-        public void testGetAllTickets() throws Exception {
-                Ticket ticket = new Ticket();
-                ticket.setId("t1");
-
+        void testGetAllTickets() throws Exception {
                 when(ticketService.getAllTickets())
-                                .thenReturn(Collections.singletonList(ticket));
+                                .thenReturn(Collections.singletonList(new Ticket()));
 
                 mockMvc.perform(get("/tickets"))
                                 .andExpect(status().isOk());
         }
 
-        // =============================
-        // GET BY ID
-        // =============================
         @Test
-        public void testGetTicketById() throws Exception {
+        void testGetTicketById() throws Exception {
                 Ticket ticket = new Ticket();
                 ticket.setId("t1");
 
@@ -93,11 +71,8 @@ public class TicketControllerTest {
                                 .andExpect(jsonPath("$.id").value("t1"));
         }
 
-        // =============================
-        // UPDATE STATUS
-        // =============================
         @Test
-        public void testUpdateStatus() throws Exception {
+        void testUpdateStatus() throws Exception {
                 Ticket ticket = new Ticket();
                 ticket.setId("t1");
                 ticket.setStatus(TicketStatus.RESOLVED);
@@ -110,11 +85,8 @@ public class TicketControllerTest {
                                 .andExpect(status().isOk());
         }
 
-        // =============================
-        // DELETE
-        // =============================
         @Test
-        public void testDeleteTicket() throws Exception {
+        void testDeleteTicket() throws Exception {
                 doNothing().when(ticketService).deleteTicket("t1");
 
                 mockMvc.perform(delete("/tickets/t1"))
