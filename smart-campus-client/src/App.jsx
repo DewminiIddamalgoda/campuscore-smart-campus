@@ -26,6 +26,7 @@ import UserProfile from './pages/Profile/UserProfile';
 import EditProfile from './pages/Profile/EditProfile';
 import UserNotificationsPage from './pages/Profile/UserNotificationsPage';
 import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
+import UserTicketsPage from "./pages/Profile/UserTicketsPage";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -68,6 +69,7 @@ function App() {
           <Route path="/resources/add" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><UserLayout><AddResourcePage /></UserLayout></ProtectedRoute>} />
           <Route path="/resources/edit/:id" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><UserLayout><EditResourcePage /></UserLayout></ProtectedRoute>} />
           <Route path="/tickets" element={<UserLayout><TicketsPage /></UserLayout>} />
+          <Route path="/profile/tickets" element={<UserLayout><UserTicketsPage /></UserLayout>} />
           
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AdminDashboard /></AdminLayoutWrapper></ProtectedRoute>} />

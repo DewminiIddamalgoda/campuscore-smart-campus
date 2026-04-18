@@ -5,9 +5,9 @@
 /* ── Variables ── */
 :root {
     /* BACKGROUNDS */
-    --bg:           #0b1e3a;
+    --bg:           #6c718f;
     --bg2:          #10294f;
-    --bg3:          #183a6b;
+    --bg3:          #e3e5e8;
   
     /* SURFACES */
     --surface:      rgba(255,255,255,0.06);
@@ -21,7 +21,7 @@
   
     /* TEXT */
     --text:         #f1f5f9;
-    --text-muted:   #94a3b8;
+    --text-muted:   #f7f9fd;
   
     /* BADGES (more subtle + modern) */
     --badge-low:    rgba(34,197,94,0.15);

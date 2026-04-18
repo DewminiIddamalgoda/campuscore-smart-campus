@@ -1,5 +1,6 @@
 package com.groupxx.smartcampus.service;
 
+import com.groupxx.smartcampus.dto.auth.UserProfileDto;
 import com.groupxx.smartcampus.entity.AppUser;
 import com.groupxx.smartcampus.entity.Ticket;
 import com.groupxx.smartcampus.enums.TicketStatus;
@@ -27,12 +28,28 @@ public class TicketService {
     @Autowired
     private NotificationService notificationService;
 
-    // Create Ticket
-    public Ticket createTicket(Ticket ticket) {
+    @Autowired
+    private AuthService authService; // 🔥 important
+
+    // 🔥 Create Ticket (FIXED)
+    public Ticket createTicket(String token, Ticket ticket) {
+
+        UserProfileDto user = authService.getCurrentUser(token); // ✅ FIX
+
+        ticket.setUserId(user.getUserId()); // ✅ use DTO
         ticket.setStatus(TicketStatus.OPEN);
         ticket.setCreatedAt(LocalDateTime.now());
         ticket.setUpdatedAt(LocalDateTime.now());
+
         return ticketRepository.save(ticket);
+    }
+
+    // 🔥 Get Logged User Tickets (FIXED)
+    public List<Ticket> getMyTickets(String token) {
+
+        UserProfileDto user = authService.getCurrentUser(token); // ✅ FIX
+
+        return ticketRepository.findByUserId(user.getUserId());
     }
 
     // Get All Tickets
@@ -51,24 +68,36 @@ public class TicketService {
         Ticket ticket = getTicketById(id);
         ticket.setStatus(status);
         ticket.setUpdatedAt(LocalDateTime.now());
+
         Ticket saved = ticketRepository.save(ticket);
 
         String ownerEmail = userRepository.findByUserId(ticket.getUserId())
                 .map(AppUser::getEmail).orElse(null);
-        String msg = "Your ticket '" + ticket.getTitle() + "' status has been updated to " + status.name() + ".";
+
+        String msg = "Your ticket '" + ticket.getTitle() +
+                "' status updated to " + status.name();
+
         if (ownerEmail != null) {
-            notificationService.createUserNotification(ownerEmail, "TICKET_STATUS", msg, ticket.getId(), null);
+            notificationService.createUserNotification(
+                    ownerEmail, "TICKET_STATUS", msg, ticket.getId(), null);
         }
-        notificationService.createSystemNotification("TICKET_STATUS", msg, ticket.getId(), null);
+
+        notificationService.createSystemNotification(
+                "TICKET_STATUS", msg, ticket.getId(), null);
 
         return saved;
     }
 
     // Assign Technician
     public Ticket assignTechnician(String id, String technicianId) {
+
+        AppUser tech = userRepository.findByUserId(technicianId)
+                .orElseThrow(() -> new RuntimeException("Technician not found"));
+
         Ticket ticket = getTicketById(id);
-        ticket.setAssignedTo(technicianId);
+        ticket.setAssignedTo(tech.getUserId());
         ticket.setUpdatedAt(LocalDateTime.now());
+
         return ticketRepository.save(ticket);
     }
 
@@ -84,37 +113,32 @@ public class TicketService {
         Ticket ticket = getTicketById(id);
 
         List<String> imageUrls = ticket.getImageUrls();
-        if (imageUrls == null) {
+        if (imageUrls == null)
             imageUrls = new ArrayList<>();
-        }
 
         if (imageUrls.size() + files.size() > 3) {
             throw new RuntimeException("Maximum 3 images allowed");
         }
 
         String uploadDir = System.getProperty("user.dir") + "/uploads/";
-        File directory = new File(uploadDir);
-
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
+        File dir = new File(uploadDir);
+        if (!dir.exists())
+            dir.mkdirs();
 
         for (MultipartFile file : files) {
             try {
-                if (file.isEmpty()) {
+                if (file.isEmpty())
                     continue;
-                }
 
                 String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-                File destination = new File(uploadDir + fileName);
+                File dest = new File(uploadDir + fileName);
 
-                file.transferTo(destination);
+                file.transferTo(dest);
 
-                // Save relative path (clean)
                 imageUrls.add("uploads/" + fileName);
 
             } catch (IOException e) {
-                throw new RuntimeException("File upload failed: " + e.getMessage());
+                throw new RuntimeException("File upload failed");
             }
         }
 
