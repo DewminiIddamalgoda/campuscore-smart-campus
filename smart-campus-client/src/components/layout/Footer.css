@@ -68,6 +68,7 @@
   background-clip: text;
 }
 
+
 .footer-cta p {
   font-size: 1.1rem;
   color: rgba(255, 255, 255, 0.8);
@@ -125,7 +126,7 @@
 }
 
 .footer-block h4 {
-  color: white;
+  color: white !important;
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 25px;
@@ -168,7 +169,7 @@
 }
 
 .footer-logo-wrap h3 {
-  color: white;
+  color: white !important;
   font-size: 1.8rem;
   font-weight: 700;
   margin-bottom: 0;
@@ -230,8 +231,28 @@
   padding-left: 0;
 }
 
+.site-footer {
+  color: #ffffff;
+}
+
+.site-footer .footer-links a,
+.site-footer .footer-links a:hover,
+.site-footer .footer-socials a,
+.site-footer .footer-socials a:hover,
+.site-footer .mini-contact-item a,
+.site-footer .mini-contact-item a:hover,
+.site-footer .smoothScroll {
+  color: #ffffff !important;
+}
+
+#footer a:hover,
+.footer-links a:hover,
+.footer-socials a:hover,
+.mini-contact-item a:hover {
+  color: #ffffff !important;
+}
+
 .footer-links a:hover {
-  color: white;
   padding-left: 8px;
 }
 

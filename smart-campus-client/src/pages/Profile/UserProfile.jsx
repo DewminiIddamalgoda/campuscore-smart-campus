@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Button, Card, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Badge } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import bookingApi from '../../api/bookingApi';
 import resourceApi from '../../api/resourceApi';
 import notificationApi from '../../api/notificationApi';
 import { Link } from 'react-router-dom';
 import { FaBell } from 'react-icons/fa';
+import './ProfileStyles.css';
 
 const STATUS_BADGE = {
   PENDING: 'warning',
@@ -46,7 +47,7 @@ const UserProfile = () => {
             const r = await resourceApi.getResourceById(id);
             map[id] = r;
           } catch (e) {
-            // ignore
+            console.warn('Failed to load resource details for', id, e);
           }
         }));
 
@@ -64,67 +65,99 @@ const UserProfile = () => {
           setUnreadCount(count || 0);
         }
       } catch (e) {
-        // ignore
+        console.warn('Failed to load unread notification count', e);
       }
     };
 
     load();
   }, [user?.email]);
 
+  let bookingContent;
+
+  if (loading) {
+    bookingContent = <div className="notification-empty">Loading bookings...</div>;
+  } else if (bookings.length === 0) {
+    bookingContent = <div className="notification-empty">No bookings found.</div>;
+  } else {
+    bookingContent = bookings.map((b) => (
+      <Card key={b.id || b._id || Math.random()} className="booking-card mb-3">
+        <Card.Body>
+          <h5>{resourcesById[b.resourceId]?.name || resourcesById[b.resourceId]?.title || 'Resource'}</h5>
+          <p className="mb-1">
+            <strong>When:</strong> {b.date || b.bookingDate || b.from || ''} {b.time || b.fromTime || ''}
+          </p>
+          <p className="mb-1">
+            <strong>Status:</strong>{' '}
+            <Badge bg={STATUS_BADGE[b.status] || 'secondary'}>
+              {STATUS_LABEL[b.status] || b.status}
+            </Badge>
+          </p>
+          <p className="mb-0">
+            <strong>Details:</strong> {b.details || b.purpose || ''}
+          </p>
+        </Card.Body>
+      </Card>
+    ));
+  }
+
   return (
-    <div className="profile-page" style={{ paddingTop: '140px', paddingBottom: '140px' }}>
+    <div className="profile-page">
       <Container>
-        <Row>
-          <Col md={8} className="mx-auto">
-            <Card className="modern-card p-4 p-md-5">
-              <h2 className="mb-1">Welcome {user?.fullName}</h2>
-              <p className="text-muted mb-4">{user?.email}</p>
+        <div className="profile-panel">
+          <Row>
+            <Col md={8} className="mx-auto">
+              <Card className="profile-card p-4 p-md-5">
+                <div className="profile-header">
+                  <div>
+                    <h2 className="mb-1">Welcome {user?.fullName}</h2>
+                    <p className="profile-subtitle">Your dashboard for bookings, notifications and profile updates.</p>
+                  </div>
+                  <div className="welcome-stats">
+                    <div className="stat-item">
+                      <span className="stat-number">{bookings.length}</span>
+                      <span className="stat-label">Total Bookings</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-number">{unreadCount}</span>
+                      <span className="stat-label">Unread Notifications</span>
+                    </div>
+                  </div>
+                </div>
 
-              <div className="d-flex align-items-center gap-2 mb-4">
-                <Link to="/profile/edit" className="btn btn-primary" style={{ color: '#fff' }}>Edit Profile</Link>
-                <Link to="/profile/notifications" className="btn btn-outline-secondary position-relative">
-                  <FaBell />
-                  {unreadCount > 0 && (
-                    <Badge pill bg="danger" className="position-absolute top-0 start-100 translate-middle">
-                      {unreadCount}
-                    </Badge>
-                  )}
-                  {' '}Notifications
-                </Link>
-              </div>
+                <div className="profile-actions mb-4">
+                  <Link to="/profile/edit" className="btn modern-btn">
+                    Edit Profile
+                  </Link>
+                  <Link to="/profile/notifications" className="btn secondary-btn position-relative">
+                    <FaBell />
+                    Notifications
+                    {unreadCount > 0 && (
+                      <Badge pill bg="danger" className="position-absolute top-0 start-100 translate-middle">
+                        {unreadCount}
+                      </Badge>
+                    )}
+                  </Link>
+                </div>
 
-              <hr />
+                <div className="quick-tips mb-4">
+                  <h5>Quick Tips</h5>
+                  <ul className="tips-list">
+                    <li>📅 Book resources in advance to ensure availability</li>
+                    <li>🔔 Check notifications regularly for booking updates</li>
+                    <li>✏️ Keep your profile updated for better communication</li>
+                    <li>📞 Contact support if you need help with bookings</li>
+                  </ul>
+                </div>
 
-              <h4>Your Booking Requests</h4>
+                <div className="form-section-divider" />
 
-              {loading ? (
-                <div>Loading bookings...</div>
-              ) : bookings.length === 0 ? (
-                <div>No bookings found.</div>
-              ) : (
-                bookings.map((b) => (
-                  <Card key={b.id || b._id || Math.random()} className="mb-3">
-                    <Card.Body>
-                      <h5>{resourcesById[b.resourceId]?.name || resourcesById[b.resourceId]?.title || 'Resource'}</h5>
-                      <p>
-                        <strong>When:</strong> {b.date || b.bookingDate || b.from || ''} {b.time || b.fromTime || ''}
-                      </p>
-                      <p>
-                        <strong>Status: </strong>
-                        <Badge bg={STATUS_BADGE[b.status] || 'secondary'}>
-                          {STATUS_LABEL[b.status] || b.status}
-                        </Badge>
-                      </p>
-                      <p>
-                        <strong>Details:</strong> {b.details || b.purpose || ''}
-                      </p>
-                    </Card.Body>
-                  </Card>
-                ))
-              )}
-            </Card>
-          </Col>
-        </Row>
+                <h4>Your Booking Requests</h4>
+
+                {bookingContent}
+              </Card>
+            </Col>
+          </Row>
+        </div>
       </Container>
     </div>
   );
