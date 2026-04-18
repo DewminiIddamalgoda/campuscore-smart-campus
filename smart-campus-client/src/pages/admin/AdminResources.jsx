@@ -16,23 +16,28 @@ import {
   Alert,
   Spinner
 } from 'react-bootstrap';
-import { 
-  FaPlus, 
-  FaEdit, 
-  FaTrash, 
-  FaSearch, 
+import {
+  FaPlus,
+  FaEdit,
+  FaTrash,
+  FaSearch,
   FaFilter,
   FaEye
 } from 'react-icons/fa';
 import resourceApi from '../../api/resourceApi';
 
 const styles = `
+  .admin-resources {
+    background: #f8fafc;
+    min-height: 100vh;
+  }
+
   .admin-resources .page-header {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    padding: 2rem 0;
-    margin-bottom: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    padding: 2rem 1.5rem;
+    margin-bottom: 1.75rem;
+    border-radius: 20px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
   }
 
   .admin-resources .page-header .resource-title {
@@ -42,13 +47,166 @@ const styles = `
     font-size: 2rem;
   }
 
-  .admin-resources .page-header * {
-    color: inherit;
+  .admin-resources .resource-subtitle {
+    color: rgba(255, 255, 255, 0.85);
+    margin-top: 0.75rem;
+    max-width: 680px;
+    line-height: 1.6;
+  }
+
+  .admin-resources .summary-card {
+    border-radius: 20px;
+    min-height: 130px;
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
+    border: none;
+  }
+
+  .admin-resources .summary-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 40px rgba(15, 23, 42, 0.12);
+  }
+
+  .admin-resources .summary-card .summary-top {
+    padding: 1rem 1.25rem;
+    color: #fff;
+    background: linear-gradient(135deg, #0f766e 0%, #06b6d4 100%);
+  }
+
+  .admin-resources .summary-card .summary-body {
+    padding: 1rem 1.25rem;
+    background: #fff;
+  }
+
+  .admin-resources .summary-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .admin-resources .summary-label {
+    font-size: 0.95rem;
+    color: #475569;
+  }
+
+  .admin-resources .filter-card {
+    border-radius: 20px;
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+    border: none;
+  }
+
+  .admin-resources .filter-card .form-select {
+    border-radius: 14px;
+    min-height: 54px;
+    border: 1px solid #e2e8f0;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .admin-resources .filter-card .form-select:focus {
+    border-color: #06b6d4;
+    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.14);
+  }
+
+  .admin-resources .filter-card .search-input-group {
+    display: flex;
+    align-items: stretch;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #ffffff;
+    min-height: 54px;
+  }
+
+  .admin-resources .filter-card .search-input-group:focus-within {
+    border-color: #06b6d4;
+    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.14);
+  }
+
+  .admin-resources .filter-card .search-input-group .input-group-text {
+    background: linear-gradient(135deg, #0f766e, #06b6d4);
+    color: #ffffff;
+    border: none;
+    border-radius: 0;
+    min-width: 56px;
+    width: 56px;
+    justify-content: center;
+    align-items: center;
+    display: inline-flex;
+    padding: 0;
+    flex-shrink: 0;
+    box-shadow: none;
+  }
+
+  .admin-resources .filter-card .search-input {
+    border: none !important;
+    border-radius: 0 !important;
+    min-height: 54px;
+    background: #ffffff;
+    box-shadow: none !important;
+    padding: 0 16px;
+    transition: none;
+  }
+
+  .admin-resources .filter-card .search-input:focus {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none;
+    transform: none;
+  }
+
+  .admin-resources .filter-card .search-input::placeholder {
+    color: #94a3b8;
+  }
+
+  .admin-resources .filter-card .btn {
+    min-height: 54px;
+    border-radius: 14px;
+  }
+
+  .admin-resources .table-responsive {
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+  }
+
+  .admin-resources table {
+    margin-bottom: 0;
+    background: #ffffff;
+  }
+
+  .admin-resources table thead {
+    background: rgba(15, 23, 42, 0.04);
   }
 
   .admin-resources table thead th {
-    color: #000000 !important;
+    color: #0f172a !important;
     font-weight: 700;
+    border-bottom: none;
+  }
+
+  .admin-resources table tbody tr:hover {
+    background: rgba(6, 182, 212, 0.08);
+  }
+
+  .admin-resources .action-dropdown .dropdown-toggle {
+    border-radius: 14px;
+    min-height: 38px;
+  }
+
+  .admin-resources .tip-card {
+    border-radius: 20px;
+    border: none;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(59, 130, 246, 0.08));
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.06);
+  }
+
+  .admin-resources .tip-card h5 {
+    font-weight: 700;
+  }
+
+  .admin-resources .tip-card p {
+    color: #475569;
   }
 `;
 
@@ -96,7 +254,7 @@ const AdminResources = () => {
     document.head.appendChild(styleElement);
 
     return () => {
-      document.head.removeChild(styleElement);
+      styleElement.remove();
     };
   }, []);
 
@@ -180,7 +338,7 @@ const AdminResources = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this resource?')) {
+    if (globalThis.confirm('Are you sure you want to delete this resource?')) {
       try {
         await resourceApi.deleteResource(id);
         setResources(resources.filter((r) => r.id !== id));
@@ -216,6 +374,11 @@ const AdminResources = () => {
 
     return matchesSearch && matchesType && matchesStatus;
   });
+
+  const totalResources = resources.length;
+  const activeResources = resources.filter((resource) => resource.status === 'ACTIVE').length;
+  const maintenanceResources = resources.filter((resource) => resource.status === 'UNDER_MAINTENANCE').length;
+  const outOfServiceResources = resources.filter((resource) => resource.status === 'OUT_OF_SERVICE').length;
 
   const getStatusBadge = (status) => {
     const statusOption = statusOptions.find((s) => s.value === status);
@@ -274,8 +437,13 @@ const AdminResources = () => {
         )}
 
         <div className="page-header p-4 mb-4">
-          <div className="d-flex justify-content-between align-items-center">
-            <h2 className="mb-0 resource-title">Resource Management</h2>
+          <div className="d-flex justify-content-between align-items-start flex-column flex-md-row gap-3">
+            <div>
+              <h2 className="mb-0 resource-title">Resource Management</h2>
+              <p className="resource-subtitle">
+                Keep campus spaces and equipment organized with real-time availability, capacity details, and quick edit actions.
+              </p>
+            </div>
             <Button variant="primary" onClick={() => navigate('/admin/resources/add')}>
               <FaPlus className="me-2" />
               Add Resource
@@ -283,67 +451,122 @@ const AdminResources = () => {
           </div>
         </div>
 
-        <Card className="mb-4 shadow-sm border-0">
-          <Card.Body>
-            <Row>
-              <Col md={4}>
-                <InputGroup>
-                  <InputGroup.Text>
-                    <FaSearch />
-                  </InputGroup.Text>
-                  <FormControl
-                    placeholder="Search resources..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </InputGroup>
-              </Col>
+        <Row className="g-3 mb-4">
+          <Col md={3}>
+            <Card className="summary-card">
+              <div className="summary-top">Total Resources</div>
+              <div className="summary-body">
+                <div className="summary-value">{totalResources}</div>
+                <div className="summary-label">All registered campus spaces and equipment</div>
+              </div>
+            </Card>
+          </Col>
+          <Col md={3}>
+            <Card className="summary-card">
+              <div className="summary-top">Active</div>
+              <div className="summary-body">
+                <div className="summary-value">{activeResources}</div>
+                <div className="summary-label">Ready for booking</div>
+              </div>
+            </Card>
+          </Col>
+          <Col md={3}>
+            <Card className="summary-card">
+              <div className="summary-top">Maintenance</div>
+              <div className="summary-body">
+                <div className="summary-value">{maintenanceResources}</div>
+                <div className="summary-label">Needs attention or repair</div>
+              </div>
+            </Card>
+          </Col>
+          <Col md={3}>
+            <Card className="summary-card">
+              <div className="summary-top">Out of Service</div>
+              <div className="summary-body">
+                <div className="summary-value">{outOfServiceResources}</div>
+                <div className="summary-label">Temporarily unavailable</div>
+              </div>
+            </Card>
+          </Col>
+        </Row>
 
-              <Col md={3}>
-                <Form.Select
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value)}
-                >
-                  <option value="all">All Types</option>
-                  {resourceTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Col>
+        <Row className="g-4 mb-4">
+          <Col lg={8}>
+            <Card className="filter-card shadow-sm border-0">
+              <Card.Body>
+                <Row className="g-3 align-items-center">
+                  <Col md={4}>
+                    <InputGroup className="search-input-group shadow-sm">
+                      <InputGroup.Text>
+                        <FaSearch />
+                      </InputGroup.Text>
+                      <FormControl
+                        className="search-input"
+                        placeholder="Search resources..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </InputGroup>
+                  </Col>
 
-              <Col md={3}>
-                <Form.Select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                >
-                  <option value="all">All Status</option>
-                  {statusOptions.map((status) => (
-                    <option key={status.value} value={status.value}>
-                      {status.label}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Col>
+                  <Col md={3}>
+                    <Form.Select
+                      value={filterType}
+                      onChange={(e) => setFilterType(e.target.value)}
+                    >
+                      <option value="all">All Types</option>
+                      {resourceTypes.map((type) => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Col>
 
-              <Col md={2}>
-                <Button
-                  variant="outline-secondary"
-                  className="w-100"
-                  onClick={() => {
-                    setSearchTerm('');
-                    setFilterType('all');
-                    setFilterStatus('all');
-                  }}
-                >
-                  <FaFilter className="me-2" />
-                  Clear
-                </Button>
-              </Col>
-            </Row>
-          </Card.Body>
-        </Card>
+                  <Col md={3}>
+                    <Form.Select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                    >
+                      <option value="all">All Status</option>
+                      {statusOptions.map((status) => (
+                        <option key={status.value} value={status.value}>
+                          {status.label}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Col>
+
+                  <Col md={2}>
+                    <Button
+                      variant="outline-secondary"
+                      className="w-100"
+                      onClick={() => {
+                        setSearchTerm('');
+                        setFilterType('all');
+                        setFilterStatus('all');
+                      }}
+                    >
+                      <FaFilter className="me-2" />
+                      Clear
+                    </Button>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+          </Col>
+
+          <Col lg={4}>
+            <Card className="tip-card p-3">
+              <Card.Body>
+                <h5>Quick Tips</h5>
+                <p className="mb-0">
+                  Use the search bar to find resources instantly, and keep the availability times updated so users can book without delays.
+                </p>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
 
         <Card className="shadow-sm border-0">
           <Card.Body>
@@ -380,7 +603,7 @@ const AdminResources = () => {
                         </small>
                       </td>
                       <td>
-                        <Dropdown>
+                        <Dropdown className="action-dropdown">
                           <Dropdown.Toggle variant="outline-primary" size="sm">
                             Actions
                           </Dropdown.Toggle>
