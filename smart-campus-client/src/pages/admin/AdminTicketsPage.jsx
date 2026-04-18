@@ -84,7 +84,9 @@ const AdminTicketsPage = () => {
         {/* HEADER */}
         <div className="admin-ticket-header">
             <div>
-                <h2>Ticket Management</h2>
+            <h2 style={{ color: "red !important" }}>
+  Ticket Management
+</h2>
                 <p>Monitor issues, update status, and respond to users</p>
             </div>
 
@@ -111,12 +113,12 @@ const AdminTicketsPage = () => {
             <Table hover responsive>
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Title</th>
-                  <th>User</th>
-                  <th>Priority</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th >ID</th>
+                  <th >Title</th>
+                  <th >User</th>
+                  <th >Priority</th>
+                  <th >Status</th>
+                  <th >Actions</th>
                 </tr>
               </thead>
 

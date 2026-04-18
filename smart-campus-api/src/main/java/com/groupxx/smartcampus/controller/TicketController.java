@@ -12,31 +12,42 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/tickets")
-@CrossOrigin(origins = "*") // allow frontend access
+@CrossOrigin(origins = "*")
 public class TicketController {
 
     @Autowired
     private TicketService ticketService;
 
-    // 1. Create Ticket
+    // 🔥 Create Ticket (logged user)
     @PostMapping
-    public ResponseEntity<Ticket> createTicket(@RequestBody Ticket ticket) {
-        return ResponseEntity.ok(ticketService.createTicket(ticket));
+    public ResponseEntity<Ticket> createTicket(
+            @RequestHeader("Authorization") String token,
+            @RequestBody Ticket ticket) {
+
+        return ResponseEntity.ok(ticketService.createTicket(token, ticket));
     }
 
-    // 2. Get All Tickets
+    // 🔥 Get Logged User Tickets
+    @GetMapping("/my")
+    public ResponseEntity<List<Ticket>> getMyTickets(
+            @RequestHeader("Authorization") String token) {
+
+        return ResponseEntity.ok(ticketService.getMyTickets(token));
+    }
+
+    // Get All Tickets (admin use)
     @GetMapping
     public ResponseEntity<List<Ticket>> getAllTickets() {
         return ResponseEntity.ok(ticketService.getAllTickets());
     }
 
-    // 3. Get Ticket by ID
+    // Get Ticket by ID
     @GetMapping("/{id}")
     public ResponseEntity<Ticket> getTicketById(@PathVariable String id) {
         return ResponseEntity.ok(ticketService.getTicketById(id));
     }
 
-    // 4. Update Ticket Status
+    // Update Status
     @PutMapping("/{id}/status")
     public ResponseEntity<Ticket> updateStatus(
             @PathVariable String id,
@@ -45,7 +56,7 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.updateStatus(id, status));
     }
 
-    // 5. Assign Technician
+    // Assign Technician
     @PutMapping("/{id}/assign")
     public ResponseEntity<Ticket> assignTechnician(
             @PathVariable String id,
@@ -54,13 +65,14 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.assignTechnician(id, technicianId));
     }
 
-    // 6. Delete Ticket
+    // Delete Ticket
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTicket(@PathVariable String id) {
         ticketService.deleteTicket(id);
         return ResponseEntity.ok("Ticket deleted successfully");
     }
 
+    // Upload Images
     @PostMapping("/{id}/upload")
     public ResponseEntity<Ticket> uploadImages(
             @PathVariable String id,

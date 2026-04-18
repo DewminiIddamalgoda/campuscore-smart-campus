@@ -11,24 +11,24 @@
   .admin-ticket-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
+    align-items: flex-start;
+    gap: 20px;
   }
   
   .admin-ticket-header h2 {
-    margin: 0;
-    font-size: 24px;
+    color: #fcf7f7 !important;
   }
-  
+
   .admin-ticket-header p {
-    margin: 0;
     color: #94a3b8;
+    margin: 0;
   }
   
   /* ===== STATS ===== */
   .admin-header-stats {
     display: flex;
     gap: 15px;
+    margin-bottom: 2%;
   }
   
   .stat-box {
@@ -57,24 +57,18 @@
   /* ===== TABLE ===== */
   .table {
     background: #1e293b;
-    color: white;
+    color: rgb(6, 6, 6);
     border-radius: 10px;
     overflow: hidden;
+    top: 5%;
   }
   
-  .table thead {
-    background: #020617;
+  .table thead th {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    font-weight: 600;
   }
-  
-  .table th {
-    font-size: 13px;
-    color: #94a3b8;
-  }
-  
-  .table td {
-    vertical-align: middle;
-  }
-  
+
   .table tr:hover {
     background: rgba(255,255,255,0.05);
   }

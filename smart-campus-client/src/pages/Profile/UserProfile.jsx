@@ -7,6 +7,7 @@ import notificationApi from '../../api/notificationApi';
 import { Link } from 'react-router-dom';
 import { FaBell } from 'react-icons/fa';
 import './ProfileStyles.css';
+import { getMyTickets, getComments, addComment } from '../../api/ticketService';
 
 const STATUS_BADGE = {
   PENDING: 'warning',
@@ -28,6 +29,9 @@ const UserProfile = () => {
   const [resourcesById, setResourcesById] = useState({});
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [tickets, setTickets] = useState([]);
+const [ticketComments, setTicketComments] = useState({});
+const [newComment, setNewComment] = useState({});
 
   useEffect(() => {
     const load = async () => {
@@ -67,10 +71,29 @@ const UserProfile = () => {
       } catch (e) {
         console.warn('Failed to load unread notification count', e);
       }
+
+      try {
+        const res = await getMyTickets();
+        setTickets(res.data || []);
+      } catch (e) {
+        console.warn('Failed to load tickets', e);
+      }
     };
 
     load();
   }, [user?.email]);
+
+  const loadComments = async (ticketId) => {
+    try {
+      const res = await getComments(ticketId);
+      setTicketComments((prev) => ({
+        ...prev,
+        [ticketId]: res.data
+      }));
+    } catch (e) {
+      console.warn('Failed to load comments', e);
+    }
+  };
 
   let bookingContent;
 
@@ -121,6 +144,11 @@ const UserProfile = () => {
                       <span className="stat-number">{unreadCount}</span>
                       <span className="stat-label">Unread Notifications</span>
                     </div>
+
+                    <div className="stat-item">
+                      <span className="stat-number">{tickets.length}</span>
+                      <span className="stat-label">My Tickets</span>
+                    </div>
                   </div>
                 </div>
 
@@ -136,6 +164,9 @@ const UserProfile = () => {
                         {unreadCount}
                       </Badge>
                     )}
+                  </Link>
+                  <Link to="/profile/tickets" className="btn secondary-btn">
+                    🎫 My Tickets
                   </Link>
                 </div>
 
