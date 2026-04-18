@@ -27,38 +27,51 @@ public class CommentService {
     @Autowired
     private NotificationService notificationService;
 
-    // Add Comment
-    public Comment addComment(Comment comment) {
+    @Autowired
+    private AuthService authService; // 🔥 NEW
+
+    // 🔥 Add Comment (secure)
+    public Comment addComment(String token, String ticketId, Comment comment) {
+
+        var user = authService.getCurrentUser(token);
+
+        comment.setTicketId(ticketId);
+        comment.setUserId(user.getUserId()); // ✅ REAL USER
         comment.setCreatedAt(LocalDateTime.now());
+
         Comment saved = commentRepository.save(comment);
 
-        ticketRepository.findById(comment.getTicketId()).ifPresent(ticket -> {
+        ticketRepository.findById(ticketId).ifPresent(ticket -> {
             String ownerEmail = userRepository.findByUserId(ticket.getUserId())
                     .map(AppUser::getEmail).orElse(null);
-            if (ownerEmail != null && !ownerEmail.equals(
-                    userRepository.findByUserId(comment.getUserId()).map(AppUser::getEmail).orElse(null))) {
-                notificationService.createUserNotification(ownerEmail, "TICKET_COMMENT",
-                        "A new comment was added on your ticket '" + ticket.getTitle() + "'.",
-                        ticket.getId(), null);
+
+            if (ownerEmail != null) {
+                notificationService.createUserNotification(
+                        ownerEmail,
+                        "TICKET_COMMENT",
+                        "New comment on your ticket '" + ticket.getTitle() + "'",
+                        ticket.getId(),
+                        null);
             }
-            notificationService.createSystemNotification("TICKET_COMMENT",
-                    "New comment on ticket '" + ticket.getTitle() + "'.", ticket.getId(), null);
         });
 
         return saved;
     }
 
-    // Get Comments by Ticket
+    // Get Comments
     public List<Comment> getCommentsByTicket(String ticketId) {
         return commentRepository.findByTicketId(ticketId);
     }
 
-    // Update Comment (only owner)
-    public Comment updateComment(String commentId, String userId, String message) {
+    // 🔥 Update Comment
+    public Comment updateComment(String token, String commentId, String message) {
+
+        var user = authService.getCurrentUser(token);
+
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-        if (!comment.getUserId().equals(userId)) {
+        if (!comment.getUserId().equals(user.getUserId())) {
             throw new RuntimeException("You can only edit your own comment");
         }
 
@@ -66,12 +79,15 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    // Delete Comment (only owner)
-    public void deleteComment(String commentId, String userId) {
+    // 🔥 Delete Comment
+    public void deleteComment(String token, String commentId) {
+
+        var user = authService.getCurrentUser(token);
+
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-        if (!comment.getUserId().equals(userId)) {
+        if (!comment.getUserId().equals(user.getUserId())) {
             throw new RuntimeException("You can only delete your own comment");
         }
 
