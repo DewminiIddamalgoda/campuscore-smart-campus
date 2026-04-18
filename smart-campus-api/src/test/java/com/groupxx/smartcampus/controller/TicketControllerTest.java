@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -33,6 +34,9 @@ class TicketControllerTest {
         @Autowired
         private ObjectMapper objectMapper;
 
+        // =============================
+        // CREATE TICKET
+        // =============================
         @Test
         void testCreateTicket() throws Exception {
                 Ticket ticket = new Ticket();
@@ -50,15 +54,41 @@ class TicketControllerTest {
                                 .andExpect(jsonPath("$.title").value("AC not working"));
         }
 
+        // =============================
+        // GET MY TICKETS (NEW)
+        // =============================
+        @Test
+        void testGetMyTickets() throws Exception {
+                Ticket ticket = new Ticket();
+                ticket.setId("t1");
+
+                when(ticketService.getMyTickets(anyString()))
+                                .thenReturn(List.of(ticket));
+
+                mockMvc.perform(get("/tickets/my")
+                                .header("Authorization", "Bearer test-token"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].id").value("t1"));
+        }
+
+        // =============================
+        // GET ALL TICKETS
+        // =============================
         @Test
         void testGetAllTickets() throws Exception {
+                Ticket ticket = new Ticket();
+                ticket.setId("t1");
+
                 when(ticketService.getAllTickets())
-                                .thenReturn(Collections.singletonList(new Ticket()));
+                                .thenReturn(Collections.singletonList(ticket));
 
                 mockMvc.perform(get("/tickets"))
                                 .andExpect(status().isOk());
         }
 
+        // =============================
+        // GET BY ID
+        // =============================
         @Test
         void testGetTicketById() throws Exception {
                 Ticket ticket = new Ticket();
@@ -71,6 +101,9 @@ class TicketControllerTest {
                                 .andExpect(jsonPath("$.id").value("t1"));
         }
 
+        // =============================
+        // UPDATE STATUS
+        // =============================
         @Test
         void testUpdateStatus() throws Exception {
                 Ticket ticket = new Ticket();
@@ -85,6 +118,9 @@ class TicketControllerTest {
                                 .andExpect(status().isOk());
         }
 
+        // =============================
+        // DELETE
+        // =============================
         @Test
         void testDeleteTicket() throws Exception {
                 doNothing().when(ticketService).deleteTicket("t1");
