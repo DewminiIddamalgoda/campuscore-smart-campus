@@ -18,7 +18,7 @@ public class TicketController {
     @Autowired
     private TicketService ticketService;
 
-    // 🔥 Create Ticket (logged user)
+    // Create Ticket (logged user)
     @PostMapping
     public ResponseEntity<Ticket> createTicket(
             @RequestHeader("Authorization") String token,
@@ -27,7 +27,7 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.createTicket(token, ticket));
     }
 
-    // 🔥 Get Logged User Tickets
+    // Get Logged User Tickets
     @GetMapping("/my")
     public ResponseEntity<List<Ticket>> getMyTickets(
             @RequestHeader("Authorization") String token) {
