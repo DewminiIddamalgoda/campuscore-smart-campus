@@ -196,7 +196,7 @@
   align-items: center;
   gap: 6px;
   background: transparent;
-  color: var(--text-muted);
+  color: #e3e5e8;
   font-family: 'DM Sans', sans-serif;
   font-size: 14px;
   font-weight: 500;
@@ -208,7 +208,7 @@
   text-decoration: none;
 }
 
-.tp-btn-ghost:hover { color: var(--text); border-color: var(--border-hover); background: var(--surface); }
+.tp-btn-ghost:hover { color: #e3e5e8; border-color: var(--border-hover); background: var(--surface); }
 
 /* ════════════════════════════════
    STATS
@@ -338,6 +338,10 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 18px;
+}
+
+.tp-ticket-grid p{
+  color: #e3e5e8;
 }
 
 .tp-ticket-card {
@@ -695,4 +699,27 @@
 
 @media (max-width: 480px) {
   .tp-stats { grid-template-columns: 1fr 1fr; }
+}
+
+.tp-field input,
+.tp-field textarea {
+  color: #ffffff;              /* text color */
+  background-color: #1e2f4f;   /* match your dark theme */
+  border: 1px solid #4a6fa5;
+}
+
+.tp-field input::placeholder,
+.tp-field textarea::placeholder {
+  color: #a0b3d6;              /* lighter placeholder */
+}
+
+.tp-field select {
+  color: #ffffff;
+  background-color: #1e2f4f;
+  border: 1px solid #4a6fa5;
+}
+
+.tp-field select option {
+  color: #000000;   /* dropdown list text */
+  background-color: #ffffff;  /* dropdown list background */
 }

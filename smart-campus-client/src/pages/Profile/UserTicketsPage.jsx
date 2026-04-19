@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Container, Card, Badge } from "react-bootstrap";
-import { getMyTickets, getComments, addComment } from "../../api/ticketService";
+import {
+  getMyTickets,
+  getComments,
+  addComment,
+  updateComment,
+  deleteComment
+} from "../../api/ticketService";
 import { useAuth } from "../../context/AuthContext";
 import "./ProfileStyles.css";
 
@@ -10,6 +16,7 @@ const UserTicketsPage = () => {
   const [tickets, setTickets] = useState([]);
   const [comments, setComments] = useState({});
   const [newComment, setNewComment] = useState({});
+  const [editingComment, setEditingComment] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,9 +28,7 @@ const UserTicketsPage = () => {
       const res = await getMyTickets();
       setTickets(res.data || []);
 
-      // 🔥 auto-load comments for each ticket
       res.data.forEach((t) => loadComments(t.id));
-
     } catch (e) {
       console.error("Failed to load tickets", e);
     }
@@ -42,7 +47,11 @@ const UserTicketsPage = () => {
 
   const handleAddComment = async (ticketId) => {
     const text = newComment[ticketId];
-    if (!text || text.trim() === "") return;
+
+    if (!text || text.trim() === "") {
+      alert("Comment cannot be empty");
+      return;
+    }
 
     try {
       await addComment(ticketId, { message: text });
@@ -53,9 +62,34 @@ const UserTicketsPage = () => {
       }));
 
       loadComments(ticketId);
-
     } catch (e) {
       console.error("Failed to add comment", e);
+    }
+  };
+
+  const handleUpdateComment = async (ticketId, commentId) => {
+    const text = editingComment[commentId];
+
+    if (!text || text.trim() === "") {
+      alert("Comment cannot be empty");
+      return;
+    }
+
+    try {
+      await updateComment(ticketId, commentId, text);
+      setEditingComment({});
+      loadComments(ticketId);
+    } catch (e) {
+      console.error("Failed to update comment", e);
+    }
+  };
+
+  const handleDeleteComment = async (ticketId, commentId) => {
+    try {
+      await deleteComment(ticketId, commentId);
+      loadComments(ticketId);
+    } catch (e) {
+      console.error("Failed to delete comment", e);
     }
   };
 
@@ -67,7 +101,6 @@ const UserTicketsPage = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-  
     return date.toLocaleString("en-GB", {
       day: "2-digit",
       month: "short",
@@ -94,59 +127,94 @@ const UserTicketsPage = () => {
 
                 {/* HEADER */}
                 <div className="d-flex justify-content-between align-items-start mb-2">
-                <div>
+                  <div>
                     <h5 className="mb-1">{t.title}</h5>
-
-                    {/* 🔹 ticket id */}
                     <small className="text-muted">Ticket ID: #{t.id}</small>
-                </div>
+                  </div>
 
-                <div style={{ display: "flex", gap: 8 }}>
+                  <div style={{ display: "flex", gap: 8 }}>
                     <Badge bg="secondary">{t.status}</Badge>
                     <Badge bg={getPriorityColor(t.priority)}>
-                    {t.priority}
+                      {t.priority}
                     </Badge>
-                </div>
+                  </div>
                 </div>
 
                 {/* DESCRIPTION */}
                 <p className="text-muted mb-2">{t.description}</p>
 
-                {/* 🔥 EXTRA INFO ROW */}
+                {/* META */}
                 <div className="ticket-meta">
-                <span>📁 {t.category || "General"}</span>
-
-                {t.resourceId && (
-                    <span>🏢 {t.resourceId}</span>
-                )}
-
-                {t.assignedTo && (
-                    <span>👨‍🔧 {t.assignedTo}</span>
-                )}
-
-                {t.createdAt && (
-                    <span>🕒 {formatDate(t.createdAt)}</span>
-                )}
+                  <span>📁 {t.category || "General"}</span>
+                  {t.resourceId && <span>🏢 {t.resourceId}</span>}
+                  {t.assignedTo && <span>👨‍🔧 {t.assignedTo}</span>}
+                  {t.createdAt && <span>🕒 {formatDate(t.createdAt)}</span>}
                 </div>
 
-                {/* 🔥 CHAT COMMENTS */}
+                {/* COMMENTS */}
                 <div className="chat-box">
                   {(comments[t.id] || []).length === 0 ? (
                     <p className="chat-empty">No comments yet</p>
                   ) : (
-                    (comments[t.id] || []).map((c, i) => {
+                    comments[t.id].map((c) => {
                       const isMe = c.userId === user?.userId;
+                      const isEditing = editingComment[c.id] !== undefined;
 
                       return (
                         <div
-                          key={i}
+                          key={c.id}
                           className={`chat-message ${isMe ? "me" : "other"}`}
                         >
                           <div className="chat-bubble">
                             <span className="chat-user">
                               {isMe ? "You" : c.userId}
                             </span>
-                            <p>{c.message}</p>
+
+                            {isEditing ? (
+                              <>
+                                <input
+                                  className="chat-edit-input"
+                                  value={editingComment[c.id]}
+                                  onChange={(e) =>
+                                    setEditingComment((prev) => ({
+                                      ...prev,
+                                      [c.id]: e.target.value
+                                    }))
+                                  }
+                                />
+                                <button className="chat-btn chat-btn-save" onClick={() => handleUpdateComment(t.id, c.id)}>
+                                  Save
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <p>{c.message}</p>
+                                {c.createdAt && (
+                                  <small>{formatDate(c.createdAt)}</small>
+                                )}
+                              </>
+                            )}
+
+                            {isMe && !isEditing && (
+                              <div style={{ marginTop: 5 }}>
+                                <button className="chat-btn chat-btn-edit"
+                                  onClick={() =>
+                                    setEditingComment({
+                                      ...editingComment,
+                                      [c.id]: c.message
+                                    })
+                                  }
+                                >
+                                  Edit
+                                </button>
+
+                                <button className="chat-btn chat-btn-delete"
+                                  onClick={() => handleDeleteComment(t.id, c.id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       );

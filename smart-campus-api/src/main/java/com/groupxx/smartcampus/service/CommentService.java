@@ -28,49 +28,63 @@ public class CommentService {
     private NotificationService notificationService;
 
     @Autowired
-    private AuthService authService; // 🔥 NEW
+    private AuthService authService;
 
-    // 🔥 Add Comment (secure)
+    // ================= ADD COMMENT =================
     public Comment addComment(String token, String ticketId, Comment comment) {
 
         var user = authService.getCurrentUser(token);
 
+        // ✅ Validation
+        if (comment.getMessage() == null || comment.getMessage().trim().isEmpty()) {
+            throw new RuntimeException("Comment message is required");
+        }
+
+        // Optional but good: ensure ticket exists
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+
         comment.setTicketId(ticketId);
-        comment.setUserId(user.getUserId()); // ✅ REAL USER
+        comment.setUserId(user.getUserId());
         comment.setCreatedAt(LocalDateTime.now());
 
         Comment saved = commentRepository.save(comment);
 
-        ticketRepository.findById(ticketId).ifPresent(ticket -> {
-            String ownerEmail = userRepository.findByUserId(ticket.getUserId())
-                    .map(AppUser::getEmail).orElse(null);
+        // ✅ Notify ticket owner
+        String ownerEmail = userRepository.findByUserId(ticket.getUserId())
+                .map(AppUser::getEmail).orElse(null);
 
-            if (ownerEmail != null) {
-                notificationService.createUserNotification(
-                        ownerEmail,
-                        "TICKET_COMMENT",
-                        "New comment on your ticket '" + ticket.getTitle() + "'",
-                        ticket.getId(),
-                        null);
-            }
-        });
+        if (ownerEmail != null) {
+            notificationService.createUserNotification(
+                    ownerEmail,
+                    "TICKET_COMMENT",
+                    "New comment on your ticket '" + ticket.getTitle() + "'",
+                    ticket.getId(),
+                    null);
+        }
 
         return saved;
     }
 
-    // Get Comments
+    // ================= GET COMMENTS =================
     public List<Comment> getCommentsByTicket(String ticketId) {
         return commentRepository.findByTicketId(ticketId);
     }
 
-    // 🔥 Update Comment
+    // ================= UPDATE COMMENT =================
     public Comment updateComment(String token, String commentId, String message) {
 
         var user = authService.getCurrentUser(token);
 
+        // ✅ Validation
+        if (message == null || message.trim().isEmpty()) {
+            throw new RuntimeException("Comment message is required");
+        }
+
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
+        // ✅ Ownership check
         if (!comment.getUserId().equals(user.getUserId())) {
             throw new RuntimeException("You can only edit your own comment");
         }
@@ -79,7 +93,7 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    // 🔥 Delete Comment
+    // ================= DELETE COMMENT =================
     public void deleteComment(String token, String commentId) {
 
         var user = authService.getCurrentUser(token);
