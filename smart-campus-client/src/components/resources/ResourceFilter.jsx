@@ -27,8 +27,7 @@ const ResourceFilter = ({ onFilter, onReset }) => {
 
   const statusOptions = [
     { value: 'ACTIVE', label: 'Active' },
-    { value: 'OUT_OF_SERVICE', label: 'Out of Service' },
-    { value: 'UNDER_MAINTENANCE', label: 'Under Maintenance' }
+    { value: 'OUT_OF_SERVICE', label: 'Out of Service' }
   ];
 
   const filterResources = (resources) => {

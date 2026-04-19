@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Badge, Button, Form, InputGroup } from 'react-bootstrap';
-import { useAuth } from '../../context/AuthContext';
 import notificationApi from '../../api/notificationApi';
-import { FaBell, FaTrash, FaSearch } from 'react-icons/fa';
+import { FaTrash, FaSearch } from 'react-icons/fa';
 import './ProfileStyles.css';
 
 const TYPE_BADGE = {
@@ -28,7 +27,6 @@ function formatTimestamp(ts) {
 }
 
 const UserNotificationsPage = () => {
-  const { user } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -62,27 +60,67 @@ const UserNotificationsPage = () => {
   };
 
   const filtered = notifications.filter((n) => {
+    const query = search.toLowerCase();
     const matchSearch = !search ||
-      (n.resourceName && n.resourceName.toLowerCase().includes(search.toLowerCase())) ||
-      (n.message && n.message.toLowerCase().includes(search.toLowerCase()));
-    const matchDate = !dateFilter || (n.createdAt && n.createdAt.startsWith(dateFilter));
+      n.resourceName?.toLowerCase().includes(query) ||
+      n.message?.toLowerCase().includes(query);
+    const matchDate = !dateFilter || n.createdAt?.startsWith(dateFilter);
     return matchSearch && matchDate;
   });
 
+  let notificationContent;
+  if (loading) {
+    notificationContent = <p className="notification-empty">Loading notifications...</p>;
+  } else if (filtered.length === 0) {
+    notificationContent = <Card className="notification-card notification-empty">No notifications found.</Card>;
+  } else {
+    notificationContent = filtered.map((n) => (
+      <Card key={n.id} className={`notification-card mb-3 ${n.read ? '' : 'unread'}`}>
+        <Card.Body>
+          <div className="notification-meta">
+            <Badge bg={TYPE_BADGE[n.type] || 'secondary'}>
+              {TYPE_LABEL[n.type] || n.type}
+            </Badge>
+            {n.resourceName && (
+              <span>{n.resourceName}</span>
+            )}
+            {!n.read && <Badge bg="primary" pill>New</Badge>}
+          </div>
+          <p className="mb-1" style={{ color: '#334155' }}>{n.message}</p>
+          <div className="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+            <small className="text-muted">{formatTimestamp(n.createdAt)}</small>
+            <Button
+              className="btn secondary-btn"
+              size="sm"
+              onClick={() => handleDelete(n.id)}
+            >
+              <FaTrash />
+              Delete
+            </Button>
+          </div>
+        </Card.Body>
+      </Card>
+    ));
+  }
+
   return (
     <div className="notifications-page">
-      <Container>
+      <Container fluid>
+        {/* Header Section */}
+        <div className="section-header mb-5">
+          <span className="section-label">Activity Feed</span>
+          <h1 className="section-title">
+            My Notifications
+          </h1>
+          <p className="section-description">
+            Search, filter and manage all your alerts from one place with a clean and responsive view.
+          </p>
+        </div>
+
         <div className="profile-panel">
           <Row>
             <Col md={9} className="mx-auto">
-              <div className="profile-header">
-                <div>
-                  <h2>My Notifications</h2>
-                  <p className="profile-subtitle">Search, filter and manage all your alerts from one place.</p>
-                </div>
-              </div>
-
-              <Card className="notifications-card p-4 mb-4">
+              <div className="notifications-card mb-4">
                 <Row className="notification-filter-row g-3">
                   <Col md={7}>
                     <InputGroup>
@@ -114,41 +152,9 @@ const UserNotificationsPage = () => {
                     <strong>Notification Types:</strong> Booking approvals/rejections, ticket updates, resource availability alerts, and new comments.
                   </small>
                 </div>
-              </Card>
+              </div>
 
-            {loading ? (
-              <p className="notification-empty">Loading notifications...</p>
-            ) : filtered.length === 0 ? (
-              <Card className="notification-card notification-empty">No notifications found.</Card>
-            ) : (
-              filtered.map((n) => (
-                <Card key={n.id} className={`notification-card mb-3 ${n.read ? '' : 'unread'}`}>
-                  <Card.Body>
-                    <div className="notification-meta">
-                      <Badge bg={TYPE_BADGE[n.type] || 'secondary'}>
-                        {TYPE_LABEL[n.type] || n.type}
-                      </Badge>
-                      {n.resourceName && (
-                        <span>{n.resourceName}</span>
-                      )}
-                      {!n.read && <Badge bg="primary" pill>New</Badge>}
-                    </div>
-                    <p className="mb-1" style={{ color: '#334155' }}>{n.message}</p>
-                    <div className="d-flex justify-content-between align-items-center gap-3 flex-wrap">
-                      <small className="text-muted">{formatTimestamp(n.createdAt)}</small>
-                      <Button
-                        className="btn secondary-btn"
-                        size="sm"
-                        onClick={() => handleDelete(n.id)}
-                      >
-                        <FaTrash />
-                        Delete
-                      </Button>
-                    </div>
-                  </Card.Body>
-                </Card>
-              ))
-            )}
+            {notificationContent}
           </Col>
         </Row>
         </div>
