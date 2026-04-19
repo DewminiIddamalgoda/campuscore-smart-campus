@@ -135,12 +135,24 @@ const AdminNotificationsPage = () => {
             <Table hover className="mb-0">
               <thead className="table-light">
                 <tr>
-                  <th>Type</th>
-                  <th>Message</th>
-                  <th>Resource</th>
-                  <th>Recipient</th>
-                  <th>Time</th>
-                  <th></th>
+                  <th>
+                    <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Type</span>
+                  </th>
+                  <th>
+                    <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Message</span>
+                  </th>
+                  <th>
+                    <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Resource</span>
+                  </th>
+                  <th>
+                    <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Recipient</span>
+                  </th>
+                  <th>
+                    <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Time</span>
+                  </th>
+                  <th>
+                    <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}></span>
+                  </th>
                 </tr>
               </thead>
               <tbody>

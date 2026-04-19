@@ -502,11 +502,21 @@ const AdminUsersPage = () => {
           <Table hover>
             <thead style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)' }}>
               <tr>
-                <th style={{ padding: '14px 20px' }}>#</th>
-                <th style={{ padding: '14px 20px' }}>Full Name</th>
-                <th style={{ padding: '14px 20px' }}>Email</th>
-                <th style={{ padding: '14px 20px' }}>Role</th>
-                <th style={{ padding: '14px 20px' }}>User ID</th>
+                <th style={{ padding: '14px 20px' }}>
+                  <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>#</span>
+                </th>
+                <th style={{ padding: '14px 20px' }}>
+                  <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Full Name</span>
+                </th>
+                <th style={{ padding: '14px 20px' }}>
+                  <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Email</span>
+                </th>
+                <th style={{ padding: '14px 20px' }}>
+                  <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Role</span>
+                </th>
+                <th style={{ padding: '14px 20px' }}>
+                  <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>User ID</span>
+                </th>
               </tr>
             </thead>
             <tbody>

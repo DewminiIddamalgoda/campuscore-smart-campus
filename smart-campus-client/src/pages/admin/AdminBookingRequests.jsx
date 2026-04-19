@@ -281,14 +281,14 @@ const AdminBookingRequests = () => {
                 <Table hover bordered className="mb-0 align-middle">
                   <thead className="bg-light">
                     <tr>
-                      <th>Requester</th>
-                      <th>Email</th>
-                      <th>Resource</th>
-                      <th>Date & Time</th>
-                      <th>Purpose</th>
-                      <th>Attendees</th>
-                      <th>Status</th>
-                      <th>Actions</th>
+                      <th><span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Requester</span></th>
+                      <th><span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Email</span></th>
+                      <th><span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Resource</span></th>
+                      <th><span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Date & Time</span></th>
+                      <th><span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Purpose</span></th>
+                      <th><span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Attendees</span></th>
+                      <th><span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Status</span></th>
+                      <th><span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Actions</span></th>
                     </tr>
                   </thead>
                   <tbody>
