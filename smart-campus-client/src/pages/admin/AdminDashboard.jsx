@@ -397,6 +397,109 @@ const AdminDashboard = () => {
     fetchDashboardData();
   }, []);
 
+  const buildPDFBlobFromAnalytics = (analytics) => {
+    const escapePDFText = (text) =>
+      String(text)
+        .replace(/\\/g, '\\\\')
+        .replace(/\(/g, '\\(')
+        .replace(/\)/g, '\\)')
+        .replace(/\r?\n/g, '\\n');
+
+    const lines = [
+      `Total Resources: ${analytics.totalResources ?? 0}`,
+      `Active Resources: ${analytics.activeResources ?? 0}`,
+      `Out of Service: ${analytics.outOfServiceResources ?? 0}`,
+      `Total Capacity: ${analytics.totalCapacity ?? 0}`,
+      `Average Capacity: ${analytics.averageCapacity ?? 0}`,
+      `Labs: ${analytics.labs ?? 0}`,
+      `Meeting Rooms: ${analytics.meetingRooms ?? 0}`,
+      `Equipment: ${analytics.equipment ?? 0}`,
+      `Lecture Halls: ${analytics.lectureHalls ?? 0}`,
+      '',
+      'Status Distribution:',
+      `  ACTIVE: ${analytics.statusDistribution?.ACTIVE ?? 0}`,
+      `  OUT_OF_SERVICE: ${analytics.statusDistribution?.OUT_OF_SERVICE ?? 0}`,
+      '',
+      'Recent resources:',
+    ];
+
+    const recentLines = (analytics.recentResources || [])
+      .slice(0, 5)
+      .map((resource, index) =>
+        `  ${index + 1}. ${resource.name || 'Unknown'} (${resource.type || 'Unknown'})`
+      );
+
+    const pageLines = [...lines, ...recentLines];
+
+    const title = 'Smart Campus Analytics Report';
+    const subtitle = `Generated: ${analytics.generatedAt || analytics.generatedDate || new Date().toISOString()}`;
+
+    const bodyContent = pageLines
+      .map((line) => `(${escapePDFText(line)}) Tj\nT*`)
+      .join('\n');
+
+    const pageStream = `BT\n/F2 24 Tf\n16 TL\n50 760 Td\n(${escapePDFText(title)}) Tj\nT*\n/F1 10 Tf\n(${escapePDFText(subtitle)}) Tj\nT*\n(${escapePDFText('-----------------------------------------------------------')}) Tj\nT*\n/F2 14 Tf\n(Overview) Tj\nT*\n/F1 12 Tf\n${bodyContent}\nET\n`;
+    const object4 = `4 0 obj\n<< /Length ${pageStream.length} >>\nstream\n${pageStream}endstream\nendobj\n`;
+
+    const header = '%PDF-1.4\n';
+    const pdfObjects = [
+      '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n',
+      '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n',
+      '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> >>\nendobj\n',
+      object4,
+      '5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n',
+      '6 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>\nendobj\n',
+    ];
+
+    let offset = new TextEncoder().encode(header).length;
+    const objectStarts = [];
+    const pdfParts = [header];
+
+    for (const obj of pdfObjects) {
+      objectStarts.push(offset);
+      pdfParts.push(obj);
+      offset += new TextEncoder().encode(obj).length;
+    }
+
+    const xrefStart = offset;
+    let xref = 'xref\n0 7\n0000000000 65535 f \n';
+    for (let i = 0; i < objectStarts.length; i += 1) {
+      xref += `${String(objectStarts[i]).padStart(10, '0')} 00000 n \n`;
+    }
+
+    const trailer =
+      `trailer\n<< /Size 7 /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF\n`;
+
+    const pdfString = pdfParts.join('') + xref + trailer;
+    const pdfBytes = new TextEncoder().encode(pdfString);
+    return new Blob([pdfBytes], { type: 'application/pdf' });
+  };
+
+  const downloadPDFReport = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/analytics/pdf-import', {
+        headers: { Accept: 'application/json' },
+      });
+      if (!response.ok) throw new Error('Failed to fetch analytics data');
+
+      const data = await response.json();
+      if (!data?.analytics) throw new Error('Analytics data missing in response');
+
+      const pdfBlob = buildPDFBlobFromAnalytics(data.analytics);
+      const url = window.URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'analytics-report.pdf';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Failed to download the report. Please try again.');
+    }
+  };
+
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -609,6 +712,13 @@ const AdminDashboard = () => {
                   <Badge bg="success" className="px-3 py-2 rounded-pill">
                     Live Data
                   </Badge>
+                  <button 
+                    className="btn btn-light ms-3 px-3 py-2 rounded-pill fw-semibold"
+                    onClick={downloadPDFReport}
+                    style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                  >
+                    Download PDF Report
+                  </button>
                 </div>
                 <h2 className="fw-bold mb-2 text-white">Dashboard Overview</h2>
                 <p className="mb-0 text-light opacity-75">
