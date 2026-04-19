@@ -29,14 +29,25 @@ public class TicketService {
     private NotificationService notificationService;
 
     @Autowired
-    private AuthService authService; // 🔥 important
+    private AuthService authService;
 
-    // 🔥 Create Ticket (FIXED)
+    // ================= CREATE TICKET =================
     public Ticket createTicket(String token, Ticket ticket) {
 
-        UserProfileDto user = authService.getCurrentUser(token); // ✅ FIX
+        // VALIDATIONS
+        if (ticket.getTitle() == null || ticket.getTitle().trim().isEmpty()) {
+            throw new RuntimeException("Title is required");
+        }
+        if (ticket.getDescription() == null || ticket.getDescription().trim().isEmpty()) {
+            throw new RuntimeException("Description is required");
+        }
+        if (ticket.getPriority() == null) {
+            throw new RuntimeException("Priority is required");
+        }
 
-        ticket.setUserId(user.getUserId()); // ✅ use DTO
+        UserProfileDto user = authService.getCurrentUser(token);
+
+        ticket.setUserId(user.getUserId());
         ticket.setStatus(TicketStatus.OPEN);
         ticket.setCreatedAt(LocalDateTime.now());
         ticket.setUpdatedAt(LocalDateTime.now());
@@ -44,33 +55,51 @@ public class TicketService {
         return ticketRepository.save(ticket);
     }
 
-    // 🔥 Get Logged User Tickets (FIXED)
+    // ================= GET MY TICKETS =================
     public List<Ticket> getMyTickets(String token) {
-
-        UserProfileDto user = authService.getCurrentUser(token); // ✅ FIX
-
+        UserProfileDto user = authService.getCurrentUser(token);
         return ticketRepository.findByUserId(user.getUserId());
     }
 
-    // Get All Tickets
+    // ================= GET ALL =================
     public List<Ticket> getAllTickets() {
         return ticketRepository.findAll();
     }
 
-    // Get Ticket by ID
+    // ================= GET BY ID =================
     public Ticket getTicketById(String id) {
         return ticketRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ticket not found"));
     }
 
-    // Update Status
+    // ================= UPDATE STATUS (WITH WORKFLOW) =================
     public Ticket updateStatus(String id, TicketStatus status) {
+
         Ticket ticket = getTicketById(id);
+        TicketStatus current = ticket.getStatus();
+
+        boolean valid = false;
+
+        if (current == TicketStatus.OPEN && status == TicketStatus.IN_PROGRESS) {
+            valid = true;
+        } else if (current == TicketStatus.IN_PROGRESS && status == TicketStatus.RESOLVED) {
+            valid = true;
+        } else if (current == TicketStatus.RESOLVED && status == TicketStatus.CLOSED) {
+            valid = true;
+        } else if (status == TicketStatus.REJECTED) {
+            valid = true;
+        }
+
+        if (!valid) {
+            throw new RuntimeException("Invalid status transition from " + current + " to " + status);
+        }
+
         ticket.setStatus(status);
         ticket.setUpdatedAt(LocalDateTime.now());
 
         Ticket saved = ticketRepository.save(ticket);
 
+        // Notifications (keep your existing logic)
         String ownerEmail = userRepository.findByUserId(ticket.getUserId())
                 .map(AppUser::getEmail).orElse(null);
 
@@ -88,51 +117,67 @@ public class TicketService {
         return saved;
     }
 
-    // Assign Technician
+    // ================= ASSIGN TECHNICIAN =================
     public Ticket assignTechnician(String id, String technicianId) {
 
         AppUser tech = userRepository.findByUserId(technicianId)
                 .orElseThrow(() -> new RuntimeException("Technician not found"));
 
         Ticket ticket = getTicketById(id);
+
         ticket.setAssignedTo(tech.getUserId());
         ticket.setUpdatedAt(LocalDateTime.now());
 
         return ticketRepository.save(ticket);
     }
 
-    // Delete Ticket
+    // ================= DELETE =================
     public void deleteTicket(String id) {
         Ticket ticket = getTicketById(id);
         ticketRepository.delete(ticket);
     }
 
-    // Image Upload
+    // ================= IMAGE UPLOAD (SECURED) =================
     public Ticket uploadImages(String id, List<MultipartFile> files) {
 
         Ticket ticket = getTicketById(id);
 
         List<String> imageUrls = ticket.getImageUrls();
-        if (imageUrls == null)
+        if (imageUrls == null) {
             imageUrls = new ArrayList<>();
+        }
 
+        // max 3 images
         if (imageUrls.size() + files.size() > 3) {
             throw new RuntimeException("Maximum 3 images allowed");
         }
 
         String uploadDir = System.getProperty("user.dir") + "/uploads/";
         File dir = new File(uploadDir);
-        if (!dir.exists())
+        if (!dir.exists()) {
             dir.mkdirs();
+        }
 
         for (MultipartFile file : files) {
+
+            if (file.isEmpty())
+                continue;
+
+            // FILE TYPE CHECK
+            if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
+                throw new RuntimeException("Only image files are allowed");
+            }
+
+            // FILE SIZE CHECK (2MB)
+            if (file.getSize() > 2 * 1024 * 1024) {
+                throw new RuntimeException("File size must be less than 2MB");
+            }
+
             try {
-                if (file.isEmpty())
-                    continue;
+                String fileName = System.currentTimeMillis() + "_" +
+                        file.getOriginalFilename().replace(" ", "_");
 
-                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
                 File dest = new File(uploadDir + fileName);
-
                 file.transferTo(dest);
 
                 imageUrls.add("uploads/" + fileName);

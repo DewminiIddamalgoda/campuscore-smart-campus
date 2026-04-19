@@ -48,3 +48,23 @@ export const getComments = (ticketId) => {
 export const addComment = (ticketId, data) => {
   return axios.post(`${API_URL}/${ticketId}/comments`, data);
 };
+
+// Update comment
+export const updateComment = (ticketId, commentId, message) => {
+  return axios.put(
+    `${API_URL}/${ticketId}/comments/${commentId}?message=${message}`
+  );
+};
+
+// Delete comment
+export const deleteComment = (ticketId, commentId) => {
+  return axios.delete(
+    `${API_URL}/${ticketId}/comments/${commentId}`
+  );
+};
+
+export const assignTechnician = (ticketId, technicianId) => {
+  return axios.put(
+    `${API_URL}/${ticketId}/assign?technicianId=${technicianId}`
+  );
+};

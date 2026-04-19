@@ -150,6 +150,11 @@ const AdminSidebar = () => {
       label: 'Tickets'
     },
     {
+      path: '/admin/technician-tickets',
+      icon: <FaTools />, // you can change icon later
+      label: 'Technician View'
+    },
+    {
       path: '/admin/check-in',
       icon: <FaQrcode />,
       label: 'QR Check-in'
