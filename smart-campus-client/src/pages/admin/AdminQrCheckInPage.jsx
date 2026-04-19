@@ -245,11 +245,11 @@ const AdminQrCheckInPage = () => {
                     <Table hover bordered className="align-middle mb-0">
                       <thead>
                         <tr>
-                          <th>Resource</th>
-                          <th>Booked By</th>
-                          <th>Date</th>
-                          <th>Time Slot</th>
-                          <th>Checked In At</th>
+                          <th><span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Resource</span></th>
+                          <th><span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Booked By</span></th>
+                          <th><span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Date</span></th>
+                          <th><span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Time Slot</span></th>
+                          <th><span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Checked In At</span></th>
                         </tr>
                       </thead>
                       <tbody>

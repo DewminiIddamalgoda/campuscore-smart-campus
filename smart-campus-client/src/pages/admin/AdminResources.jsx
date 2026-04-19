@@ -563,16 +563,30 @@ const AdminResources = () => {
             <div className="table-responsive">
               <Table hover>
                 <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Capacity</th>
-                    <th>Location</th>
-                    <th>Status</th>
-                    <th>Availability</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
+                <tr>
+                  <th>
+                    <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Name</span>
+                  </th>
+                  <th>
+                    <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Type</span>
+                  </th>
+                  <th>
+                    <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Capacity</span>
+                  </th>
+                  <th>
+                    <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Location</span>
+                  </th>
+                  <th>
+                    <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Status</span>
+                  </th>
+                  <th>
+                    <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Availability</span>
+                  </th>
+                  <th>
+                    <span style={{ color: '#000', WebkitTextFillColor: '#000', fontWeight: 700 }}>Actions</span>
+                  </th>
+                </tr>
+              </thead>
                 <tbody>
                   {filteredResources.map((resource) => (
                     <tr key={resource.id}>
