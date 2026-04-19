@@ -409,3 +409,71 @@
   align-items: center;
   gap: 5px;
 }
+
+/* EDIT INPUT (inside chat bubble) */
+.chat-edit-input {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #cbd5f5;
+  font-size: 13px;
+  margin-top: 5px;
+  margin-bottom: 6px;
+}
+
+/* ACTION BUTTON GROUP */
+.chat-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+/* COMMON BUTTON STYLE */
+.chat-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* EDIT BUTTON */
+.chat-btn-edit {
+  background: #6366f1;
+  color: white;
+}
+
+.chat-btn-edit:hover {
+  background: #4f46e5;
+}
+
+/* DELETE BUTTON */
+.chat-btn-delete {
+  background: #ef4444;
+  color: white;
+}
+
+.chat-btn-delete:hover {
+  background: #dc2626;
+}
+
+/* SAVE BUTTON */
+.chat-btn-save {
+  background: #10b981;
+  color: white;
+}
+
+.chat-btn-save:hover {
+  background: #059669;
+}
+
+/* CANCEL BUTTON (optional if you add later) */
+.chat-btn-cancel {
+  background: #94a3b8;
+  color: white;
+}
+
+.chat-btn-cancel:hover {
+  background: #64748b;
+}
