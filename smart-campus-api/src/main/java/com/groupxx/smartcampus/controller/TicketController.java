@@ -18,16 +18,17 @@ public class TicketController {
     @Autowired
     private TicketService ticketService;
 
-    // 🔥 Create Ticket (logged user)
+    // Create Ticket
     @PostMapping
     public ResponseEntity<Ticket> createTicket(
             @RequestHeader("Authorization") String token,
             @RequestBody Ticket ticket) {
 
-        return ResponseEntity.ok(ticketService.createTicket(token, ticket));
+        Ticket created = ticketService.createTicket(token, ticket);
+        return ResponseEntity.status(201).body(created);
     }
 
-    // 🔥 Get Logged User Tickets
+    // Get Logged User Tickets
     @GetMapping("/my")
     public ResponseEntity<List<Ticket>> getMyTickets(
             @RequestHeader("Authorization") String token) {
@@ -67,9 +68,9 @@ public class TicketController {
 
     // Delete Ticket
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteTicket(@PathVariable String id) {
+    public ResponseEntity<Void> deleteTicket(@PathVariable String id) {
         ticketService.deleteTicket(id);
-        return ResponseEntity.ok("Ticket deleted successfully");
+        return ResponseEntity.noContent().build();
     }
 
     // Upload Images

@@ -28,6 +28,7 @@ import UserNotificationsPage from './pages/Profile/UserNotificationsPage';
 import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import UserTicketsPage from "./pages/Profile/UserTicketsPage";
+import TechnicianPage from "./pages/admin/TechnicianTicketsPage"
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -82,6 +83,7 @@ function App() {
           <Route path="/admin/tickets" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AdminTicketsPage /></AdminLayoutWrapper></ProtectedRoute>} />
           <Route path="/admin/notifications" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AdminNotificationsPage /></AdminLayoutWrapper></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['ADMIN', 'TECHNICIAN']}><AdminLayoutWrapper><AdminUsersPage /></AdminLayoutWrapper></ProtectedRoute>} />
+          <Route path="/admin/technician-tickets" element={ <ProtectedRoute allowedRoles={['TECHNICIAN', 'ADMIN']}><AdminLayoutWrapper> <TechnicianPage /></AdminLayoutWrapper></ProtectedRoute>}/>
           
           
           {/* Test Routes */}

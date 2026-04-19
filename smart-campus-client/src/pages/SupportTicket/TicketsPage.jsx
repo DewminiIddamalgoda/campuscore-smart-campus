@@ -21,7 +21,7 @@ const FAQ = [
   },
   {
     q: "Can I attach multiple images?",
-    a: "Yes! You can attach up to 5 images per ticket to help us understand the issue.",
+    a: "Yes! You can attach up to 3 images per ticket to help us understand the issue.",
   },
   {
     q: "How do I track my ticket status?",
@@ -89,7 +89,7 @@ const TicketsPage = () => {
   };
 
   const handleFileChange = (e) => {
-    const selected = [...e.target.files].slice(0, 5);
+    const selected = [...e.target.files].slice(0, 3);
     setFiles(selected);
     setPreviews(selected.map((f) => URL.createObjectURL(f)));
   };
@@ -102,7 +102,10 @@ const TicketsPage = () => {
   };
 
   const handleSubmit = async () => {
-    if (!form.title || !form.description) return;
+    if (!form.title || !form.description) {
+      alert("Please fill all required fields");
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await createTicket(form);
@@ -357,7 +360,7 @@ const TicketsPage = () => {
                   </div>
 
                   <div className="tp-field">
-                    <label>Attach Images <small>(up to 5)</small></label>
+                    <label>Attach Images <small>(up to 3)</small></label>
                     <label className="tp-file-drop">
                       <input type="file" multiple accept="image/*" onChange={handleFileChange} hidden />
                       <span className="tp-file-icon">📎</span>
