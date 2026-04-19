@@ -7,7 +7,7 @@ import notificationApi from '../../api/notificationApi';
 import { Link } from 'react-router-dom';
 import { FaBell } from 'react-icons/fa';
 import './ProfileStyles.css';
-import { getMyTickets, getComments, addComment } from '../../api/ticketService';
+import { getMyTickets } from '../../api/ticketService';
 
 const STATUS_BADGE = {
   PENDING: 'warning',
@@ -30,8 +30,6 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [tickets, setTickets] = useState([]);
-const [ticketComments, setTicketComments] = useState({});
-const [newComment, setNewComment] = useState({});
 
   useEffect(() => {
     const load = async () => {
@@ -83,18 +81,6 @@ const [newComment, setNewComment] = useState({});
     load();
   }, [user?.email]);
 
-  const loadComments = async (ticketId) => {
-    try {
-      const res = await getComments(ticketId);
-      setTicketComments((prev) => ({
-        ...prev,
-        [ticketId]: res.data
-      }));
-    } catch (e) {
-      console.warn('Failed to load comments', e);
-    }
-  };
-
   let bookingContent;
 
   if (loading) {
@@ -125,38 +111,42 @@ const [newComment, setNewComment] = useState({});
 
   return (
     <div className="profile-page">
-      <Container>
+      <Container fluid>
+        {/* Header Section */}
+        <div className="section-header mb-5">
+          <span className="section-label">Profile</span>
+          <h1 className="section-title">
+            Welcome {user?.fullName}
+          </h1>
+          <p className="section-description">
+            Your Profile for bookings, notifications, tickets, and profile updates in one sleek workspace.
+          </p>
+        </div>
+
         <div className="profile-panel">
           <Row>
-            <Col md={8} className="mx-auto">
-              <Card className="profile-card p-4 p-md-5">
-                <div className="profile-header">
-                  <div>
-                    <h2 className="mb-1">Welcome {user?.fullName}</h2>
-                    <p className="profile-subtitle">Your dashboard for bookings, notifications and profile updates.</p>
+            <Col xs={12} lg={10} className="mx-auto">
+              <div className="profile-card mb-4">
+                <div className="welcome-stats mb-4">
+                  <div className="stat-item">
+                    <span className="stat-number">{bookings.length}</span>
+                    <span className="stat-label">Total Bookings</span>
                   </div>
-                  <div className="welcome-stats">
-                    <div className="stat-item">
-                      <span className="stat-number">{bookings.length}</span>
-                      <span className="stat-label">Total Bookings</span>
-                    </div>
-                    <div className="stat-item">
-                      <span className="stat-number">{unreadCount}</span>
-                      <span className="stat-label">Unread Notifications</span>
-                    </div>
-
-                    <div className="stat-item">
-                      <span className="stat-number">{tickets.length}</span>
-                      <span className="stat-label">My Tickets</span>
-                    </div>
+                  <div className="stat-item">
+                    <span className="stat-number">{unreadCount}</span>
+                    <span className="stat-label">Unread Notifications</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-number">{tickets.length}</span>
+                    <span className="stat-label">My Tickets</span>
                   </div>
                 </div>
 
                 <div className="profile-actions mb-4">
-                  <Link to="/profile/edit" className="btn modern-btn">
+                  <Link to="/profile/edit" className="btn modern-btn action-btn">
                     Edit Profile
                   </Link>
-                  <Link to="/profile/notifications" className="btn secondary-btn position-relative">
+                  <Link to="/profile/notifications" className="btn secondary-btn action-btn position-relative">
                     <FaBell />
                     Notifications
                     {unreadCount > 0 && (
@@ -165,7 +155,7 @@ const [newComment, setNewComment] = useState({});
                       </Badge>
                     )}
                   </Link>
-                  <Link to="/profile/tickets" className="btn secondary-btn">
+                  <Link to="/profile/tickets" className="btn secondary-btn action-btn">
                     🎫 My Tickets
                   </Link>
                 </div>
@@ -185,7 +175,7 @@ const [newComment, setNewComment] = useState({});
                 <h4>Your Booking Requests</h4>
 
                 {bookingContent}
-              </Card>
+              </div>
             </Col>
           </Row>
         </div>
